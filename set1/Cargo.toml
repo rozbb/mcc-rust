@@ -1,0 +1,7 @@
+[package]
+name = "set1"
+version = "0.0.1"
+
+[lib]
+name = "set1"
+path = "lib.rs"
