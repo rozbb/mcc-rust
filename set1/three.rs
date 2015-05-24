@@ -20,8 +20,16 @@ fn index_of_coincidence(bytes: &[u8]) -> f64 {
 }
 
 // How far away is bytes from English?
-fn analyze(bytes: &[u8]) -> f64 {
-    (0.065 - index_of_coincidence(bytes)).abs()
+pub fn analyze(s: String) -> f64 {
+    let bytes = s.as_bytes();
+    for b in bytes {
+        match *b {
+               0...31 => return INFINITY,
+            127...255 => return INFINITY,
+                    _ => ()
+        }
+    }
+    (0.0674633677f64 - index_of_coincidence(bytes)).abs()
 }
 
 pub fn make_key_vec(key_byte: u8, len: usize) -> Vec<u8> {
@@ -32,7 +40,7 @@ pub fn make_key_vec(key_byte: u8, len: usize) -> Vec<u8> {
     v
 }
 
-pub fn test_all_keys(input: &[u8]) -> (u8, f64) {
+pub fn test_all_keys<F: Fn(String) -> f64>(input: &[u8], err_func: F) -> (u8, f64) {
     let mut winning_key = 0;
     let mut lowest_err = INFINITY;
     for u in 0..255 {
@@ -40,9 +48,13 @@ pub fn test_all_keys(input: &[u8]) -> (u8, f64) {
         let xored = xor_bytes(input, &test_vec);
         /*{
             let s = String::from_utf8(xored.clone());
-            if s.is_ok() { println!("{}", s.unwrap()); }
+            if s.is_ok() { println!("\"{}\"", s.unwrap()); }
         }*/
-        let err = analyze(&xored);
+        let s = match String::from_utf8(xored) {
+            Ok(t)  => t,
+            Err(_) => continue,
+        };
+        let err = err_func(s);
         if err < lowest_err {
             lowest_err = err;
             winning_key = u;
@@ -55,7 +67,7 @@ pub fn test_all_keys(input: &[u8]) -> (u8, f64) {
 #[test]
 fn tst3 () {
     let b = decode_hex("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736");
-    let (winning_key, min_err) = test_all_keys(&b);
+    let (winning_key, min_err) = test_all_keys(&b, analyze);
     println!("{} won with an error of {}", winning_key, min_err);
     let winning_key_vec = make_key_vec(winning_key, b.len());
     let xored = xor_bytes(&b, &winning_key_vec);
