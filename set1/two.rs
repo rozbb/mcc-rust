@@ -8,7 +8,7 @@ fn nibble_to_char(nibble: u8) -> char {
     }
 }
 
-fn encode_hex(input: &[u8]) -> String {
+pub fn encode_hex(input: &[u8]) -> String {
     let mut out = String::new();
     for byte in input {
         let high = nibble_to_char(byte >> 4);

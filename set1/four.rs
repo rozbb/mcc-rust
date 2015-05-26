@@ -1,7 +1,7 @@
 use iterslide::SlideIterator;
 
 use two::{decode_hex, xor_bytes};
-use three::{analyze, make_key_vec, test_all_keys};
+use three::{coincidence_err, make_key_vec, test_all_keys};
 use std::ascii::AsciiExt;
 use std::borrow::Borrow;
 use std::collections::HashMap;
@@ -10,7 +10,7 @@ use std::fs::File;
 use std::io::{BufReader, BufRead};
 use std::str::FromStr;
 
-fn get_lines(filename: &str) -> Vec<String> {
+pub fn get_lines(filename: &str) -> Vec<String> {
     let mut out = Vec::<String>::new();
     let file = File::open(filename).unwrap();
     let buf = BufReader::new(file);
@@ -30,7 +30,7 @@ fn fill_bigram_hashmap() -> HashMap<String, f64> {
 }
 
 // How far away is this from English?
-fn chi_sq_monogram(s: String) -> f64 {
+pub fn chi_sq_monogram(s: String) -> f64 {
 
     let histogram: &mut [usize; 26] = &mut [0; 26];
     for c in s.to_lowercase().chars() {
@@ -62,8 +62,7 @@ fn chi_sq_monogram(s: String) -> f64 {
     err
 }
 
-// There are 676 possible bigrams; 30 is NOT good enough
-fn chi_sq_bigram(s: String) -> f64 {
+pub fn chi_sq_bigram(s: String) -> f64 {
     for c in s.to_lowercase().chars() {
         if !c.is_ascii() { return f64::INFINITY; } // We only want ascii
         match c as u8 {
@@ -96,7 +95,7 @@ fn chi_sq_bigram(s: String) -> f64 {
     err
 }
 
-fn braindead_err(s: String) -> f64 {
+pub fn braindead_err(s: String) -> f64 {
     let mut err = 0f64;
     let english_freqs = [0.08167, 0.01492, 0.02782, 0.04253f64,
                          0.12702, 0.02228, 0.02015, 0.06094,
@@ -120,7 +119,7 @@ fn braindead_err(s: String) -> f64 {
     1f64 / err
 }
 
-fn extra_braindead_err(s: String) -> f64 {
+pub fn extra_braindead_err(s: String) -> f64 {
     let mut count = 0f64;
     for c in s.to_lowercase().chars() {
         if !c.is_ascii() { return f64::INFINITY; } // We only want ascii
@@ -136,13 +135,13 @@ fn extra_braindead_err(s: String) -> f64 {
     1f64 / (count / s.len() as f64)
 }
 
-fn test_all<F: Copy+Fn(String) -> f64>(ciphertexts: &[&str],
+fn test_all<F: Copy+Fn(String) -> f64>(ciphertexts: &[&[u8]],
                                        err_func: F) -> (u8, usize, f64) {
     let mut lowest_err = f64::INFINITY;
     let mut winning_line_idx = 0usize;
     let mut winning_key = 0;
     for (i, ct) in ciphertexts.iter().enumerate() {
-        let (key, err) = test_all_keys(&decode_hex(ct), err_func);
+        let (key, err) = test_all_keys(ct, err_func);
         if err < lowest_err {
             //println!("New winning err: {}", err);
             lowest_err = err;
@@ -160,13 +159,13 @@ fn tst4() {
     //   a lower score than "Now that the party is jumping\n"...go figure.
     // chi_sq_bigram also does not work and I'm not entirely certain why
     let err_func = braindead_err;
-    let lines = get_lines("four.txt");
-    let borrowed = lines.iter().map(|s| s.borrow()).collect::<Vec<&str>>();
+    let lines: Vec<Vec<u8>> = get_lines("four.txt").iter().map(|s| decode_hex(s.borrow())).collect();
+    let borrowed = lines.iter().map(|s| &s[..]).collect::<Vec<&[u8]>>();
 
-    let (key, idx, err) = test_all(&borrowed[..], err_func);
+    let (key_byte, idx, err) = test_all(&borrowed[..], err_func);
 
-    let key_vec = make_key_vec(key, lines[0].len());
-    let xored = xor_bytes(&decode_hex(&lines[idx]), &key_vec);
+    let key_vec = make_key_vec(&[key_byte], lines[0].len());
+    let xored = xor_bytes(borrowed[idx], &key_vec);
     let plaintext = String::from_utf8(xored).unwrap();
     println!("Plaintext (err {:1.3}): \"{}\"", err, plaintext);
     println!("Correct answer err: {}", err_func("Now that the party is jumping\n".to_string()));
