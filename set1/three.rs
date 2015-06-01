@@ -70,8 +70,9 @@ pub fn test_all_keys<F: Fn(String) -> f64>(input: &[u8], err_func: F) -> (u8, f6
 fn tst3 () {
     let b = decode_hex("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736");
     let (winning_key, min_err) = test_all_keys(&b, coincidence_err);
-    println!("{} won with an error of {}", winning_key, min_err);
+    //println!("{} won with an error of {}", winning_key, min_err);
     let winning_key_vec = make_key_vec(&[winning_key], b.len());
     let xored = xor_bytes(&b, &winning_key_vec);
-    println!("Plaintext: \"{}\"", String::from_utf8(xored).unwrap());
+    let plaintext = String::from_utf8(xored).unwrap();
+    assert_eq!(plaintext, "Cooking MC's like a pound of bacon");
 }

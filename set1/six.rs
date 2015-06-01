@@ -2,7 +2,6 @@ use one::decode_hex;
 use two::{encode_hex, xor_bytes};
 use three::{coincidence_err, make_key_vec, test_all_keys};
 use four::{chi_sq_monogram, chi_sq_bigram, braindead_err, extra_braindead_err};
-use std::cmp::Ord;
 use std::fs::File;
 use std::io::{BufReader, Read};
 
@@ -31,13 +30,13 @@ fn b64_to_sextet(b: char) -> u8 {
         'a'...'z' => (b as u8) - 71,
         '0'...'9' => (b as u8) + 4,
               '+' => 62u8,
-              '/' => 64u8,
+              '/' => 63u8,
               '=' => 0u8, // Placeholder value, caller should handle this
                _  => panic!("Invalid base64 input!")
     }
 }
 
-fn decode_b64(b64: &str) -> Vec<u8> {
+pub fn decode_b64(b64: &str) -> Vec<u8> {
     let mut out = Vec::<u8>::new();
 
     let chars: Vec<char> = b64.chars().collect();
@@ -73,7 +72,7 @@ fn hamming_score(bytes: &[u8], chunk_size: usize) -> f64 {
     for c in it {
         let score: u32 = hamming_dist(c, prev);
         running_avg += (score as f64) / (4*chunk_size) as f64;
-        let prev = c;
+        prev = c;
     }
 
     running_avg
@@ -85,7 +84,7 @@ fn sorted_key_sizes(ciphertext: &[u8]) -> Vec<(usize, f64)> {
         let score = hamming_score(ciphertext, size);
         out.push((size, score));
     }
-    out.sort_by(|&(a,b), &(c,d)| b.partial_cmp(&d).unwrap()); // Sort ascending by hamming_score
+    out.sort_by(|&(_,a), &(_,b)| a.partial_cmp(&b).unwrap()); // Sort ascending by hamming_score
 
     out
 }
@@ -130,13 +129,13 @@ fn tst6() {
                decode_hex("49276d206b696c6c696e6720796f757220627261696e206c\
                            696b65206120706f69736f6e6f7573206d757368726f6f6d"));
 
-    // words().collect() removes all whitespace
+    // Strip all whitespace
     let ciphertext_b64: String = dump_file("six.txt").split_whitespace().collect();
     let ciphertext_bytes: Vec<u8> = decode_b64(&ciphertext_b64);
     let mut keysize_err_tuples = sorted_key_sizes(&ciphertext_bytes);
     keysize_err_tuples.truncate(5); // Only test the top 4
 
-    let mut key_err_tuples = keysize_err_tuples.iter().map(|&(keysize, err)| 
+    let mut key_err_tuples = keysize_err_tuples.iter().map(|&(keysize, _)| 
                                                            break_with_key_size(&ciphertext_bytes, keysize))
                                                       .collect::<Vec<(Vec<u8>, f64)>>();
     key_err_tuples.sort_by(|&(_,b), &(_,d)| b.partial_cmp(&d).unwrap());
@@ -145,6 +144,6 @@ fn tst6() {
     let key_vec = make_key_vec(&final_key, ciphertext_bytes.len());
     let xored = xor_bytes(&ciphertext_bytes, &key_vec);
     let plaintext = String::from_utf8(xored).unwrap();
-    println!("Plaintext (err {:1.3}):\n{}", final_err, plaintext);
+    //println!("Plaintext (err {:1.3}):\n{}", final_err, plaintext);
     assert!(plaintext.starts_with("I'm back and I'm ringin' the bell"));
 }

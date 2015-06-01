@@ -1,7 +1,7 @@
 use iterslide::SlideIterator;
 
 use two::{decode_hex, xor_bytes};
-use three::{coincidence_err, make_key_vec, test_all_keys};
+use three::{make_key_vec, test_all_keys};
 use std::ascii::AsciiExt;
 use std::borrow::Borrow;
 use std::collections::HashMap;
@@ -11,7 +11,6 @@ use std::io::{BufReader, BufRead};
 use std::str::FromStr;
 
 pub fn get_lines(filename: &str) -> Vec<String> {
-    let mut out = Vec::<String>::new();
     let file = File::open(filename).unwrap();
     let buf = BufReader::new(file);
 
@@ -167,7 +166,6 @@ fn tst4() {
     let key_vec = make_key_vec(&[key_byte], lines[0].len());
     let xored = xor_bytes(borrowed[idx], &key_vec);
     let plaintext = String::from_utf8(xored).unwrap();
-    println!("Plaintext (err {:1.3}): \"{}\"", err, plaintext);
-    println!("Correct answer err: {}", err_func("Now that the party is jumping\n".to_string()));
+    //println!("Plaintext (err {:1.3}): \"{}\"", err, plaintext);
     assert_eq!(plaintext, "Now that the party is jumping\n");
 }
