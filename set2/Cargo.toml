@@ -1,0 +1,10 @@
+[package]
+name = "set2"
+version = "0.0.1"
+
+[lib]
+name = "set2"
+path = "lib.rs"
+
+[dependencies]
+rust-crypto = "0.2.31"
