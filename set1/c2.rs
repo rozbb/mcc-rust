@@ -1,13 +1,4 @@
-use util::{decode_hex, encode_hex};
-
-pub fn xor_bytes(a: &[u8], b: &[u8]) -> Vec<u8> {
-    let mut out = a.to_owned();
-    for (i, val) in out.iter_mut().enumerate() {
-        *val = *val ^ b[i];
-    }
-
-    out
-}
+use util::{decode_hex, encode_hex, xor_bytes};
 
 pub fn xor_hex(a: &str, b: &str) -> Vec<u8> {
     if a.len() != b.len() {

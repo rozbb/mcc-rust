@@ -1,5 +1,4 @@
-use util::{decode_b64, decode_hex, dump_file, encode_hex};
-use c2::xor_bytes;
+use util::{decode_b64, decode_hex, dump_file, encode_hex, xor_bytes};
 use c3::{coincidence_err, make_key_vec, test_all_keys};
 use c4::{chi_sq_monogram, chi_sq_bigram, braindead_err, extra_braindead_err};
 

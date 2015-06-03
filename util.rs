@@ -1,5 +1,16 @@
+#![allow(dead_code)]
+
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read};
+
+pub fn xor_bytes(a: &[u8], b: &[u8]) -> Vec<u8> {
+    let mut out = a.to_owned();
+    for (i, val) in out.iter_mut().enumerate() {
+        *val = *val ^ b[i];
+    }
+
+    out
+}
 
 fn char_to_nibble(c: u8) -> u8 {
     match c as char {
@@ -8,7 +19,6 @@ fn char_to_nibble(c: u8) -> u8 {
                 _ => panic!("Input is not valid hex! {}", c as char)
     }
 }
-
 
 pub fn decode_hex(input: &str) -> Vec<u8> {
     let mut hex = String::new();
@@ -105,4 +115,3 @@ pub fn get_lines(filename: &str) -> Vec<String> {
 
     buf.lines().map(|s| s.unwrap()).collect()
 }
-

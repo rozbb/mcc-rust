@@ -1,5 +1,4 @@
-use util::decode_hex;
-use c2::xor_bytes;
+use util::{decode_hex, xor_bytes};
 use std::f64::INFINITY;
 
 pub fn coincidence_err(s: String) -> f64 {

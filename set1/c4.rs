@@ -1,7 +1,6 @@
 use iterslide::SlideIterator;
 
-use util::{decode_hex, get_lines};
-use c2::xor_bytes;
+use util::{decode_hex, get_lines, xor_bytes};
 use c3::{make_key_vec, test_all_keys};
 use std::ascii::AsciiExt;
 use std::collections::HashMap;
