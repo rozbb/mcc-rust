@@ -8,5 +8,4 @@ path = "lib.rs"
 
 [dependencies]
 iterslide = "0.0.5"
-rust-crypto = "0.2.31"
 openssl = "0.6.2"

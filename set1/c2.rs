@@ -1,24 +1,4 @@
-pub use one::decode_hex;
-
-fn nibble_to_char(nibble: u8) -> char {
-    match nibble {
-          0...9 => (nibble + 48) as char,
-        10...15 => (nibble + 87) as char,
-                _ => panic!("Input is bigger than a nibble! {:08x}", nibble)
-    }
-}
-
-pub fn encode_hex(input: &[u8]) -> String {
-    let mut out = String::new();
-    for byte in input {
-        let high = nibble_to_char(byte >> 4);
-        let low = nibble_to_char(byte & 15);
-
-        out.push(high); out.push(low);
-    }
-
-    out
-}
+use util::{decode_hex, encode_hex};
 
 pub fn xor_bytes(a: &[u8], b: &[u8]) -> Vec<u8> {
     let mut out = a.to_owned();

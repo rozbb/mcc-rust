@@ -1,19 +1,7 @@
-use one::decode_hex;
-use two::{encode_hex, xor_bytes};
-use three::{coincidence_err, make_key_vec, test_all_keys};
-use four::{chi_sq_monogram, chi_sq_bigram, braindead_err, extra_braindead_err};
-use std::fs::File;
-use std::io::{BufReader, Read};
-
-pub fn dump_file(filename: &str) -> String {
-    let file = File::open(filename).unwrap();
-    let mut buf = BufReader::new(file);
-
-    let mut out = String::new();
-    let _ = buf.read_to_string(&mut out).unwrap(); // Panic on read error
-
-    out
-}
+use util::{decode_b64, decode_hex, dump_file, encode_hex};
+use c2::xor_bytes;
+use c3::{coincidence_err, make_key_vec, test_all_keys};
+use c4::{chi_sq_monogram, chi_sq_bigram, braindead_err, extra_braindead_err};
 
 fn hamming_dist(a: &[u8], b: &[u8]) -> u32 {
     if a.len() != b.len() {
@@ -22,46 +10,6 @@ fn hamming_dist(a: &[u8], b: &[u8]) -> u32 {
 
     a.iter().zip(b)
      .fold(0u32, |acc, (&x,&y)| acc + (x^y).count_ones())
-}
-
-fn b64_to_sextet(b: char) -> u8 {
-    match b {
-        'A'...'Z' => (b as u8) - 65,
-        'a'...'z' => (b as u8) - 71,
-        '0'...'9' => (b as u8) + 4,
-              '+' => 62u8,
-              '/' => 63u8,
-              '=' => 0u8, // Placeholder value, caller should handle this
-               _  => panic!("Invalid base64 input!")
-    }
-}
-
-pub fn decode_b64(b64: &str) -> Vec<u8> {
-    let mut out = Vec::<u8>::new();
-
-    let chars: Vec<char> = b64.chars().collect();
-
-    for chunk in (&chars).chunks(4) {
-        if chunk.len() != 4 {
-            panic!("Base64 input's length is not a multiple of four!");
-        }
-
-        let vals: Vec<u8> = chunk.iter().map(|&i| b64_to_sextet(i)).collect();
-        let (a,b,c,d) = (vals[0], vals[1], vals[2], vals[3]);
-
-        let x: u8 = (a << 2) | (b >> 4);
-        out.push(x);
-
-        if chunk[2] == '=' { break; }
-        let y: u8 = ((b & 15) << 4) | (c >> 2);
-        out.push(y);
-
-        if chunk[3] == '=' { break; }
-        let z: u8 = ((c & 3) << 6) | d;
-        out.push(z);
-    }
-
-    out
 }
 
 fn hamming_score(bytes: &[u8], chunk_size: usize) -> f64 {
@@ -130,7 +78,7 @@ fn tst6() {
                            696b65206120706f69736f6e6f7573206d757368726f6f6d"));
 
     // Strip all whitespace
-    let ciphertext_b64: String = dump_file("six.txt").split_whitespace().collect();
+    let ciphertext_b64: String = dump_file("c6.txt").split_whitespace().collect();
     let ciphertext_bytes: Vec<u8> = decode_b64(&ciphertext_b64);
     let mut keysize_err_tuples = sorted_key_sizes(&ciphertext_bytes);
     keysize_err_tuples.truncate(5); // Only test the top 4

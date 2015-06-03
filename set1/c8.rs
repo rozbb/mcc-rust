@@ -1,6 +1,4 @@
-use one::decode_hex;
-use four::get_lines;
-use std::borrow::Borrow;
+use util::{decode_hex, get_lines};
 use std::collections::HashMap;
 
 // Returns the index of the ECB-encrypted ciphertext; None if it cannot be found
@@ -24,7 +22,7 @@ fn detect_repeating_blocks(ciphertexts: &[&[u8]], block_size: usize) -> Option<u
 
 #[test]
 fn tst8 () {
-    let lines: Vec<String> = get_lines("eight.txt");
+    let lines: Vec<String> = get_lines("c8.txt");
     let ciphertexts: Vec<Vec<u8>> = lines.iter().map(|line| decode_hex(line)).collect();
     let ciphertexts_ref = &ciphertexts.iter().map(|line| &**line).collect::<Vec<_>>();
     let idx = detect_repeating_blocks(ciphertexts_ref, 16usize).unwrap();

@@ -1,31 +1,6 @@
-fn nibble_to_byte(c: u8) -> u8 {
-    match c as char {
-        '0'...'9' => c - 48,
-        'a'...'f' => c - 87,
-                _ => panic!("Input is not valid hex! {}", c as char)
-    }
-}
+use util::decode_hex;
 
-pub fn decode_hex(input: &str) -> Vec<u8> {
-    let mut hex = String::new();
-    // If there aren't an even number of nibbles, prepend '0'
-    if (input.len() % 2) == 1 {
-        hex.push('0');
-    }
-    hex.push_str(input);
-
-    let mut bytes = Vec::<u8>::new();
-    for chunk in hex.as_bytes().chunks(2) {
-        let a: u8 = nibble_to_byte(chunk[0]);
-        let b: u8 = nibble_to_byte(chunk[1]);
-
-        bytes.push(((a << 4) | b) as u8);
-    }
-
-    bytes
-}
-
-pub fn hex_to_b64(hex: &str) -> String {
+fn hex_to_b64(hex: &str) -> String {
     let bytes: Vec<u8> = decode_hex(hex);
     let mut out = String::new();
 

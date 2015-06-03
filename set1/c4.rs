@@ -1,21 +1,12 @@
 use iterslide::SlideIterator;
 
-use two::{decode_hex, xor_bytes};
-use three::{make_key_vec, test_all_keys};
+use util::{decode_hex, get_lines};
+use c2::xor_bytes;
+use c3::{make_key_vec, test_all_keys};
 use std::ascii::AsciiExt;
-use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::f64;
-use std::fs::File;
-use std::io::{BufReader, BufRead};
 use std::str::FromStr;
-
-pub fn get_lines(filename: &str) -> Vec<String> {
-    let file = File::open(filename).unwrap();
-    let buf = BufReader::new(file);
-
-    buf.lines().map(|s| s.unwrap()).collect()
-}
 
 fn fill_bigram_hashmap() -> HashMap<String, f64> {
     let mut out = HashMap::<String, f64>::new();
@@ -158,7 +149,7 @@ fn tst4() {
     //   a lower score than "Now that the party is jumping\n"...go figure.
     // chi_sq_bigram also does not work and I'm not entirely certain why
     let err_func = braindead_err;
-    let lines: Vec<Vec<u8>> = get_lines("four.txt").iter().map(|s| decode_hex(s.borrow())).collect();
+    let lines: Vec<Vec<u8>> = get_lines("c4.txt").iter().map(|s| decode_hex(&*s)).collect();
     let borrowed = lines.iter().map(|s| &s[..]).collect::<Vec<&[u8]>>();
 
     let (key_byte, idx, err) = test_all(&borrowed[..], err_func);

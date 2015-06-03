@@ -1,4 +1,5 @@
-use two::{encode_hex, xor_bytes};
+use util::encode_hex;
+use c2::xor_bytes;
 
 pub fn xor_bytes_repeating(plaintext: &[u8], key: &[u8]) -> Vec<u8> {
     plaintext.chunks(key.len())
