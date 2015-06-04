@@ -22,7 +22,7 @@ fn fill_bigram_hashmap() -> HashMap<String, f64> {
 pub fn chi_sq_monogram(s: String) -> f64 {
 
     let histogram: &mut [usize; 26] = &mut [0; 26];
-    for c in s.to_lowercase().chars() {
+    for c in s.to_ascii_lowercase().chars() {
         if !c.is_ascii() { return f64::INFINITY; } // We only want ascii
         match c as u8 {
                       b'a'...b'z' => histogram[((c as u8)-97) as usize] += 1,
@@ -52,7 +52,7 @@ pub fn chi_sq_monogram(s: String) -> f64 {
 }
 
 pub fn chi_sq_bigram(s: String) -> f64 {
-    for c in s.to_lowercase().chars() {
+    for c in s.to_ascii_lowercase().chars() {
         if !c.is_ascii() { return f64::INFINITY; } // We only want ascii
         match c as u8 {
                 b'\x00'...b'\x08'
@@ -64,7 +64,7 @@ pub fn chi_sq_bigram(s: String) -> f64 {
     }
 
     let mut histogram = HashMap::<String, usize>::new();
-    for chrs in s.to_lowercase().chars().slide(2) {
+    for chrs in s.to_ascii_lowercase().chars().slide(2) {
         let mut bi = String::new();
         bi.push(chrs[0]); bi.push(chrs[1]);
         let curr = *histogram.get(&bi).unwrap_or(&0);
@@ -93,7 +93,7 @@ pub fn braindead_err(s: String) -> f64 {
                          0.00095, 0.05987, 0.06327, 0.09056,
                          0.02758, 0.00978, 0.02360, 0.00150,
                          0.01974, 0.00074];
-    for c in s.to_lowercase().chars() {
+    for c in s.to_ascii_lowercase().chars() {
         if !c.is_ascii() { return f64::INFINITY; } // We only want ascii
         match c as u8 {
                       b'a'...b'z' => err += english_freqs[((c as u8)-97) as usize],
@@ -110,7 +110,7 @@ pub fn braindead_err(s: String) -> f64 {
 
 pub fn extra_braindead_err(s: String) -> f64 {
     let mut count = 0f64;
-    for c in s.to_lowercase().chars() {
+    for c in s.to_ascii_lowercase().chars() {
         if !c.is_ascii() { return f64::INFINITY; } // We only want ascii
         match c as u8 {
                 b'a'...b'z'       => count += 1f64,

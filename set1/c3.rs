@@ -31,9 +31,9 @@ pub fn coincidence_err(s: String) -> f64 {
 
 // Stretches a key by repeating it until it has length out_len
 pub fn make_key_vec(key: &[u8], out_len: usize) -> Vec<u8> {
-    let mut v = Vec::new();
+    let mut v: Vec<u8> = Vec::new();
     for _ in 0..(out_len/key.len()) {
-        v.push_all(key);
+        v.extend(key.to_vec());
     }
     for b in &key[..(out_len % key.len())] {
         v.push(*b);

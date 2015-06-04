@@ -1,4 +1,3 @@
-#![feature(collections)]
 #![allow(dead_code, unused_imports, unused_variables)]
 
 #[path="../util.rs"]
