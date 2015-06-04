@@ -1,4 +1,3 @@
-use util::encode_hex;
 use std::u8;
 
 pub fn pkcs7_pad(bytes: &[u8], block_size: usize) -> Vec<u8> {
@@ -8,7 +7,7 @@ pub fn pkcs7_pad(bytes: &[u8], block_size: usize) -> Vec<u8> {
     }
 
     let mut out: Vec<u8> = bytes.to_vec();
-    let rem = block_size - (bytes.len() % block_size);
+    let rem = (block_size - (bytes.len() % block_size)) % block_size;
     for _ in 0..rem {
         out.push(rem as u8);
     }
@@ -19,5 +18,5 @@ pub fn pkcs7_pad(bytes: &[u8], block_size: usize) -> Vec<u8> {
 #[test]
 fn tst09() {
     let bytes = b"YELLOW SUBMARINE";
-    assert_eq!(encode_hex(&pkcs7_pad(bytes, 20)), "59454c4c4f57205355424d4152494e4504040404");
+    assert_eq!(&pkcs7_pad(bytes, 20), b"YELLOW SUBMARINE\x04\x04\x04\x04");
 }

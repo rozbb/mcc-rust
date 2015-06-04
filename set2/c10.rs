@@ -4,12 +4,15 @@ use crypto::{buffer, aes, blockmodes};
 use crypto::buffer::{ReadBuffer, WriteBuffer};
 use crypto::symmetriccipher::{Decryptor, Encryptor};
 
-const AES_BLOCK_SIZE: usize = 16;
+pub const AES_BLOCK_SIZE: usize = 16;
 
 // I know calling this for every block is inefficient. Sue me
-fn encrypt_block_ecb(plaintext: &[u8], key: &[u8]) -> Vec<u8> {
+pub fn encrypt_block_ecb(plaintext: &[u8], key: &[u8]) -> Vec<u8> {
     if plaintext.len() != AES_BLOCK_SIZE {
         panic!("encrypt_block_ecb only takes one block at a time!");
+    }
+    if key.len() != 16 {
+        panic!("encrypt_block_ecb only takes 128 bit keys!");
     }
     let mut encryptor = aes::ecb_encryptor(aes::KeySize::KeySize128, key, blockmodes::NoPadding);
     let mut read_buffer = buffer::RefReadBuffer::new(plaintext);
@@ -22,9 +25,12 @@ fn encrypt_block_ecb(plaintext: &[u8], key: &[u8]) -> Vec<u8> {
     write_buffer.take_read_buffer().take_remaining().to_vec()
 }
 
-fn decrypt_block_ecb(ciphertext: &[u8], key: &[u8]) -> Vec<u8> {
+pub fn decrypt_block_ecb(ciphertext: &[u8], key: &[u8]) -> Vec<u8> {
     if ciphertext.len() != AES_BLOCK_SIZE {
         panic!("decrypt_block_ecb only takes one block at a time!");
+    }
+    if key.len() != 16 {
+        panic!("decrypt_block_ecb only takes 128 bit keys!");
     }
     let mut decryptor = aes::ecb_decryptor(aes::KeySize::KeySize128, key, blockmodes::NoPadding);
     let mut read_buffer = buffer::RefReadBuffer::new(ciphertext);
@@ -39,17 +45,12 @@ fn decrypt_block_ecb(ciphertext: &[u8], key: &[u8]) -> Vec<u8> {
 // Pretty diagrams here:
 // https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_Block_Chaining_.28CBC.29
 pub fn encrypt_aes_cbc(plaintext: &[u8], key: &[u8], iv: &[u8]) -> Vec<u8> {
+    let padded = pkcs7_pad(plaintext, AES_BLOCK_SIZE);
     let mut ciphertext: Vec<u8> = Vec::new();
     let mut prev_ciphertext_block = iv.to_vec();
 
-    for block in plaintext.chunks(AES_BLOCK_SIZE) {
-        let padded = 
-            if block.len() < AES_BLOCK_SIZE {
-                pkcs7_pad(block, AES_BLOCK_SIZE)
-            } else {
-                block.to_vec() // Yeah I'll copy every block. Wanna fight about it?
-            };
-        let xored = xor_bytes(&prev_ciphertext_block, &padded);
+    for block in padded.chunks(AES_BLOCK_SIZE) {
+        let xored = xor_bytes(&prev_ciphertext_block, &block);
         let ciphertext_block = encrypt_block_ecb(&xored, key);
         ciphertext.extend(ciphertext_block.clone());
         prev_ciphertext_block = ciphertext_block;
@@ -66,7 +67,6 @@ pub fn decrypt_aes_cbc(ciphertext: &[u8], key: &[u8], iv: &[u8]) -> Vec<u8> {
         panic!("AES ciphertext should be padded to 16 bytes!");
     }
 
-    let b = [0; 16];
     for block in ciphertext.chunks(AES_BLOCK_SIZE) {
         let decrypted_block = decrypt_block_ecb(block, key);
         let plaintext_block = xor_bytes(&decrypted_block, &prev_ciphertext_block);

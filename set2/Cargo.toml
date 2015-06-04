@@ -7,4 +7,5 @@ name = "set2"
 path = "lib.rs"
 
 [dependencies]
+rand = "0.3.8"
 rust-crypto = "0.2.31"
