@@ -9,7 +9,7 @@ enum CipherMode {
     CBC
 }
 
-fn encrypt_aes_ecb(plaintext: &[u8], key: &[u8]) -> Vec<u8> {
+pub fn encrypt_aes_ecb(plaintext: &[u8], key: &[u8]) -> Vec<u8> {
     let padded = pkcs7_pad(plaintext, AES_BLOCK_SIZE);
 
     padded.chunks(AES_BLOCK_SIZE)
@@ -18,7 +18,7 @@ fn encrypt_aes_ecb(plaintext: &[u8], key: &[u8]) -> Vec<u8> {
 }
 
 // Not needed, but why not
-fn decrypt_aes_ecb(ciphertext: &[u8], key: &[u8]) -> Vec<u8> {
+pub fn decrypt_aes_ecb(ciphertext: &[u8], key: &[u8]) -> Vec<u8> {
     if ciphertext.len() != AES_BLOCK_SIZE {
         panic!("decrypt_block_ecb only takes one block at a time!");
     }
@@ -84,7 +84,7 @@ fn guess_cipher_mode(mut oracle: Box<FnMut(&[u8]) -> Vec<u8>>) -> CipherMode {
 fn test_guesser() -> bool {
     let (oracle, ciphermode) = get_random_oracle();
     let ciphermode_guess = guess_cipher_mode(oracle);
-    
+
     ciphermode_guess == ciphermode
 }
 
@@ -92,6 +92,7 @@ fn test_guesser() -> bool {
 fn tst11() {
     assert_eq!(decrypt_aes_ecb(&encrypt_aes_ecb(b"YELLOW SUBMARINE", &[0; 16]), &[0; 16]),
                b"YELLOW SUBMARINE");
+
     let n_correct = (0..100).fold(0usize, |acc, _| acc + (test_guesser() as usize));
     assert_eq!(n_correct, 100);
 }
