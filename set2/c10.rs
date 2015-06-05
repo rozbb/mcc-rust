@@ -89,7 +89,7 @@ fn tst10() {
     let decoded: Vec<u8> = decode_b64(&raw_contents);
     let plaintext = decrypt_aes_cbc(&decoded, key, &iv);
     let plaintext_str = String::from_utf8_lossy(&plaintext);
-    
+
     assert!(plaintext_str.starts_with("I'm back and I'm ringin' the bell"));
     assert!(plaintext_str.ends_with("Play that funky music \n\x04\x04\x04\x04"));
 }

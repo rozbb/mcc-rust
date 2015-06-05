@@ -34,7 +34,7 @@ pub fn chi_sq_monogram(s: String) -> f64 {
         }
     }
     let total = histogram.iter().fold(0, |acc, &f| acc + f) as f64;
-    
+
     let english_freqs = [0.08167, 0.01492, 0.02782, 0.04253f64,
                          0.12702, 0.02228, 0.02015, 0.06094,
                          0.06966, 0.00153, 0.00772, 0.04025,
@@ -80,7 +80,7 @@ pub fn chi_sq_bigram(s: String) -> f64 {
         let diff = (*histogram.get(key).unwrap_or(&0) as f64) - total*eng_freq;
         err += diff*diff / (total*eng_freq);
     }
-    
+
     err
 }
 
