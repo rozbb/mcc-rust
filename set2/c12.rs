@@ -5,7 +5,7 @@ use rand::Rng;
 use std::iter;
 use std::collections::HashMap;
 
-type Encryptor = Box<Fn(&[u8]) -> Vec<u8>>;
+pub type Encryptor = Box<Fn(&[u8]) -> Vec<u8>>;
 
 // Not the same oracle from c11. This is a fixed-key ECB oracle
 fn get_oracle() -> Encryptor {
@@ -29,7 +29,7 @@ fn get_oracle() -> Encryptor {
     Box::new(oracle)
 }
 
-fn make_vec(size: usize) -> Vec<u8> {
+pub fn make_vec(size: usize) -> Vec<u8> {
     iter::repeat(b'A').take(size).collect()
 }
 
@@ -57,7 +57,6 @@ fn find_suffix_size(oracle: &Encryptor) -> usize {
         // We pushed the internal plaintext just past the block
         // size boundary
         if new_len > base_len {
-            let block_size = new_len - base_len;
             return base_len - (size - 1);
         }
         else {

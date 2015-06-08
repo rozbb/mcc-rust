@@ -19,10 +19,6 @@ pub fn encrypt_aes_ecb(plaintext: &[u8], key: &[u8]) -> Vec<u8> {
 
 // Not needed, but why not
 pub fn decrypt_aes_ecb(ciphertext: &[u8], key: &[u8]) -> Vec<u8> {
-    if ciphertext.len() != AES_BLOCK_SIZE {
-        panic!("decrypt_block_ecb only takes one block at a time!");
-    }
-
     ciphertext.chunks(AES_BLOCK_SIZE)
               .flat_map(|block| decrypt_block_ecb(block, key))
               .collect()
