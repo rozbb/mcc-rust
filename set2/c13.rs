@@ -74,7 +74,7 @@ fn make_admin_ciphertext(oracle: &CookieEncryptor) -> Vec<u8> {
     // First find the ciphertext block for
     // "role=admin\x06\x06\x06\x06\x06\x06"
     let preimage_copy_block = pkcs7_pad(b"role=admin", AES_BLOCK_SIZE);
-    let left_padding = make_vec(AES_BLOCK_SIZE - "email=".len());
+    let left_padding = make_vec(b'A', AES_BLOCK_SIZE - "email=".len());
     let email_str = [left_padding, preimage_copy_block].iter()
                     .map(|x| String::from_utf8_lossy(x).into_owned())
                     .fold(String::new(), |acc, s| acc + &s);
@@ -86,7 +86,7 @@ fn make_admin_ciphertext(oracle: &CookieEncryptor) -> Vec<u8> {
     if email_len < 7usize {
         email_len += AES_BLOCK_SIZE; // Because why not
     }
-    let aligning_email = String::from_utf8_lossy(&make_vec(email_len-6)).into_owned()
+    let aligning_email = String::from_utf8_lossy(&make_vec(b'A', email_len-6)).into_owned()
                          + "@a.com";
     let mut final_ciphertext = oracle(&aligning_email);
     // Delete the last ciphertext block

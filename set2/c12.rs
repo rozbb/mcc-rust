@@ -29,15 +29,15 @@ fn get_oracle() -> Encryptor {
     Box::new(oracle)
 }
 
-pub fn make_vec(size: usize) -> Vec<u8> {
-    iter::repeat(b'A').take(size).collect()
+pub fn make_vec(byte: u8, size: usize) -> Vec<u8> {
+    iter::repeat(byte).take(size).collect()
 }
 
 fn find_block_size(oracle: &Encryptor) -> usize {
     let mut size = 1usize;
     let base_len = oracle(b"").len();
     loop {
-        let input = make_vec(size);
+        let input = make_vec(b'A', size);
         let new_len = oracle(&input).len();
         if new_len > base_len {
             return new_len - base_len;
@@ -52,7 +52,7 @@ fn find_suffix_size(oracle: &Encryptor) -> usize {
     let mut size = 1usize;
     let base_len = oracle(b"").len();
     loop {
-        let input = make_vec(size);
+        let input = make_vec(b'A', size);
         let new_len = oracle(&input).len();
         // We pushed the internal plaintext just past the block
         // size boundary
@@ -66,14 +66,14 @@ fn find_suffix_size(oracle: &Encryptor) -> usize {
 }
 
 fn using_ecb(oracle: &Encryptor, block_size: usize) -> bool {
-    let two_blocks = make_vec(2*block_size);
+    let two_blocks = make_vec(b'A', 2*block_size);
     let ciphertext = oracle(&two_blocks);
     let mut chunk_iter = ciphertext.chunks(block_size);
 
     chunk_iter.next().unwrap() == chunk_iter.next().unwrap()
 }
 
-fn last_n_from(v: Vec<u8>, n: usize) -> Vec<u8> {
+pub fn last_n_from(v: Vec<u8>, n: usize) -> Vec<u8> {
     let mut out = v.iter().rev().take(n)
                    .cloned().collect::<Vec<u8>>();
     out.reverse();
@@ -83,7 +83,7 @@ fn last_n_from(v: Vec<u8>, n: usize) -> Vec<u8> {
 // Makes a hashmap of all the possible ecb ciphertext blocks
 // given a prefix of length block_size-1
 fn make_hashmap(prefix: &[u8], oracle: &Encryptor,
-                block_size: usize) -> HashMap<Vec<u8>, u8> {
+                    block_size: usize) -> HashMap<Vec<u8>, u8> {
     let mut out: HashMap<Vec<u8>, u8> = HashMap::new();
     for byte in 0u8..255 {
         let mut plaintext_block = prefix.to_vec();
@@ -105,7 +105,7 @@ fn decrypt_suffix(oracle: Encryptor) -> Vec<u8> {
             if suffix.len() == suffix_size {
                 return suffix;
             }
-            let filler = make_vec(block_size - n_byte);
+            let filler = make_vec(b'A', block_size - n_byte);
 
             // block_size-1 known fixed bytes at a time; we must figure
             // out the last byte
