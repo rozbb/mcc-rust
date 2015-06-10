@@ -86,7 +86,9 @@ fn get_ciphertext_cipher_block_finder(mut oracle: Encryptor) -> CipherBlockFinde
 fn make_hashmap(prefix: &[u8],
                 cipher_block_finder: &mut CipherBlockFinder) -> HashMap<Vec<u8>, u8> {
     let mut out: HashMap<Vec<u8>, u8> = HashMap::new();
-    for byte in 0u8..255 {
+    // Recall range is exclusive on the upper bound
+    for b in 0usize..256 {
+        let byte = b as u8;
         let mut plaintext_block = prefix.to_vec();
         plaintext_block.push(byte);
         let ciphertext_block = cipher_block_finder(&plaintext_block, 0);
@@ -133,8 +135,7 @@ fn tst14() {
     let mut cipher_block_finder = get_ciphertext_cipher_block_finder(oracle);
     let secret = decrypt_suffix(&mut cipher_block_finder);
     let secret_str = String::from_utf8_lossy(&secret);
-    //println!("{}", secret_str);
 
-    //assert!(secret_str.starts_with("Rollin' in my 5.0\n"));
-    //assert!(secret_str.ends_with("Did you stop? No, I just drove by\n"));
+    assert!(secret_str.starts_with("Rollin' in my 5.0\n"));
+    assert!(secret_str.ends_with("Did you stop? No, I just drove by\n"));
 }
