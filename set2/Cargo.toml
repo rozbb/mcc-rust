@@ -6,6 +6,9 @@ version = "0.0.1"
 name = "set2"
 path = "lib.rs"
 
+[dependencies.set1]
+path = "../set1"
+
 [dependencies]
 rand = "0.3.8"
 rust-crypto = "0.2.31"

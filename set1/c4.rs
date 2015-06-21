@@ -1,11 +1,21 @@
 use iterslide::SlideIterator;
 
-use util::{decode_hex, get_lines, xor_bytes};
+use c1::decode_hex;
+use c2::xor_bytes;
 use c3::{make_key_vec, test_all_keys};
 use std::ascii::AsciiExt;
 use std::collections::HashMap;
 use std::f64;
+use std::fs::File;
+use std::io::{BufRead, BufReader, Read};
 use std::str::FromStr;
+
+pub fn get_lines(filename: &str) -> Vec<String> {
+    let file = File::open(filename).unwrap();
+    let buf = BufReader::new(file);
+
+    buf.lines().map(|s| s.unwrap()).collect()
+}
 
 fn fill_bigram_hashmap() -> HashMap<String, f64> {
     let mut out = HashMap::<String, f64>::new();
@@ -151,7 +161,7 @@ fn tst4() {
     let lines: Vec<Vec<u8>> = get_lines("c4.txt").iter().map(|s| decode_hex(&*s)).collect();
     let borrowed = lines.iter().map(|s| &s[..]).collect::<Vec<&[u8]>>();
 
-    let (key_byte, idx, err) = test_all(&borrowed[..], err_func);
+    let (key_byte, idx, _) = test_all(&borrowed[..], err_func);
 
     let key_vec = make_key_vec(&[key_byte], lines[0].len());
     let xored = xor_bytes(borrowed[idx], &key_vec);

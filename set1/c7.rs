@@ -1,4 +1,5 @@
-use util::{decode_b64, dump_file, encode_hex};
+use c2::encode_hex;
+use c6::{decode_b64, dump_file};
 use openssl::crypto::symm;
 
 pub fn decrypt_aes_ecb(ciphertext: &[u8], key: &[u8]) -> Vec<u8> {

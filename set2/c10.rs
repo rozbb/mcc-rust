@@ -1,5 +1,5 @@
-use util::{decode_b64, dump_file, xor_bytes};
 use c09::pkcs7_pad;
+use set1::{decode_b64, dump_file, xor_bytes};
 use crypto::{buffer, aes, blockmodes};
 use crypto::buffer::{ReadBuffer, WriteBuffer};
 use crypto::symmetriccipher::{Decryptor, Encryptor};

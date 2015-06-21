@@ -1,6 +1,59 @@
-use util::{decode_b64, decode_hex, dump_file, encode_hex, xor_bytes};
+use c1::decode_hex;
+use c2::{encode_hex, xor_bytes};
 use c3::{coincidence_err, make_key_vec, test_all_keys};
 use c4::{chi_sq_monogram, chi_sq_bigram, braindead_err, extra_braindead_err};
+use std::fs::File;
+use std::io::{BufReader, Read};
+
+pub fn dump_file(filename: &str) -> String {
+    let file = File::open(filename).unwrap();
+    let mut buf = BufReader::new(file);
+
+    let mut out = String::new();
+    let _ = buf.read_to_string(&mut out).unwrap(); // Panic on read error
+
+    out
+}
+
+fn b64_to_sextet(b: char) -> u8 {
+    match b {
+        'A'...'Z' => (b as u8) - 65,
+        'a'...'z' => (b as u8) - 71,
+        '0'...'9' => (b as u8) + 4,
+              '+' => 62u8,
+              '/' => 63u8,
+              '=' => 0u8, // Placeholder value, caller should handle this
+               _  => panic!("Invalid base64 input!")
+    }
+}
+
+pub fn decode_b64(b64: &str) -> Vec<u8> {
+    let mut out = Vec::<u8>::new();
+
+    let chars: Vec<char> = b64.chars().collect();
+
+    for chunk in (&chars).chunks(4) {
+        if chunk.len() != 4 {
+            panic!("Base64 input's length is not a multiple of four!");
+        }
+
+        let vals: Vec<u8> = chunk.iter().map(|&i| b64_to_sextet(i)).collect();
+        let (a,b,c,d) = (vals[0], vals[1], vals[2], vals[3]);
+
+        let x: u8 = (a << 2) | (b >> 4);
+        out.push(x);
+
+        if chunk[2] == '=' { break; }
+        let y: u8 = ((b & 15) << 4) | (c >> 2);
+        out.push(y);
+
+        if chunk[3] == '=' { break; }
+        let z: u8 = ((c & 3) << 6) | d;
+        out.push(z);
+    }
+
+    out
+}
 
 fn hamming_dist(a: &[u8], b: &[u8]) -> u32 {
     if a.len() != b.len() {
@@ -87,7 +140,7 @@ fn tst6() {
                                                       .collect::<Vec<(Vec<u8>, f64)>>();
     key_err_tuples.sort_by(|&(_,b), &(_,d)| b.partial_cmp(&d).unwrap());
 
-    let (final_key, final_err) = key_err_tuples.remove(0); // Pop off front
+    let (final_key, _) = key_err_tuples.remove(0); // Pop off front
     let key_vec = make_key_vec(&final_key, ciphertext_bytes.len());
     let xored = xor_bytes(&ciphertext_bytes, &key_vec);
     let plaintext = String::from_utf8(xored).unwrap();

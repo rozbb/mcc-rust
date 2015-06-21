@@ -1,4 +1,4 @@
-use util::decode_b64;
+use set1::decode_b64;
 use c11::encrypt_aes_ecb;
 use rand;
 use rand::Rng;

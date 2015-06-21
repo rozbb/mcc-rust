@@ -1,9 +1,9 @@
-use c10::{AES_BLOCK_SIZE, decrypt_aes_cbc, encrypt_aes_cbc};
+use set1::xor_bytes;
+use c10::{decrypt_aes_cbc, encrypt_aes_cbc, AES_BLOCK_SIZE};
 use c12::make_vec;
 use c15::pkcs7_unpad;
 use rand;
 use rand::Rng;
-use util::xor_bytes;
 
 type Encryptor = Box<Fn(&[u8]) -> Vec<u8>>;
 type Tester = Box<Fn(&[u8]) -> bool>;

@@ -1,4 +1,5 @@
-use util::{decode_hex, get_lines};
+use c1::decode_hex;
+use c4::get_lines;
 use std::collections::HashMap;
 
 // Returns the index of the ECB-encrypted ciphertext; None if it cannot be found
