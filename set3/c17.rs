@@ -1,6 +1,6 @@
-use set1::{decode_b64, encode_hex, get_lines, xor_bytes};
+use set1::{decode_b64, get_lines, xor_bytes};
 use set2::{AES_BLOCK_SIZE, decrypt_aes_cbc, encrypt_aes_cbc,
-           make_vec, pkcs7_pad, pkcs7_unpad};
+           make_vec, pkcs7_unpad};
 use rand;
 use rand::Rng;
 
