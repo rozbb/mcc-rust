@@ -15,5 +15,6 @@ mod c15;
 mod c16;
 
 pub use c09::pkcs7_pad;
-pub use c10::{decrypt_aes_cbc, encrypt_aes_cbc};
+pub use c10::{AES_BLOCK_SIZE, decrypt_aes_cbc, encrypt_aes_cbc};
 pub use c12::make_vec;
+pub use c15::pkcs7_unpad;

@@ -1,6 +1,9 @@
 pub fn pkcs7_unpad(input: &[u8]) -> Option<Vec<u8>> {
     let mut out = input.to_vec();
     let pad_len = *out.last().unwrap();
+    if pad_len == 0 { // 0 is an illegal pad byte
+        return None;
+    }
     for _ in 0u8..pad_len {
         let pad_byte = out.pop();
 
