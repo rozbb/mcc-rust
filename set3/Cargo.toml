@@ -13,4 +13,5 @@ path = "../set1"
 path = "../set2"
 
 [dependencies]
+byteorder = "0.3.10"
 rand = "0.3.8"

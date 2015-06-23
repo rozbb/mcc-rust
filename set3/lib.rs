@@ -3,6 +3,8 @@
 extern crate set1;
 extern crate set2;
 
+extern crate byteorder;
 extern crate rand;
 
 mod c17;
+mod c18;
