@@ -1,6 +1,6 @@
-use set1::{decode_b64, get_lines, xor_bytes};
+use set1::{decode_b64, get_lines,xor_bytes};
 use set2::{AES_BLOCK_SIZE, decrypt_aes_cbc, encrypt_aes_cbc,
-           make_vec, pkcs7_unpad};
+           make_vec, pkcs7_pad, pkcs7_unpad};
 use rand;
 use rand::Rng;
 
@@ -21,9 +21,9 @@ fn get_padding_oracle(line_number: usize) -> (Vec<u8>, Vec<u8>, Checker) {
     //let choice_idx = rng.gen_range(0, lines.len());
     let choice_idx = line_number;
 
-    // Do not pad. encrypt_aes_cbc does padding for us
     let plaintext_choice = &plaintext_choices[choice_idx];
-    let ciphertext_choice = encrypt_aes_cbc(plaintext_choice, &key, &iv);
+    let padded = pkcs7_pad(&plaintext_choice, AES_BLOCK_SIZE);
+    let ciphertext_choice = encrypt_aes_cbc(&padded, &key, &iv);
 
     let oracle = move |input: &[u8]| {
         // We don't take the IV explicitly, it's actually the first block

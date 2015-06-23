@@ -1,4 +1,4 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused_imports)]
 
 extern crate set1;
 
@@ -15,6 +15,7 @@ mod c15;
 mod c16;
 
 pub use c09::pkcs7_pad;
-pub use c10::{AES_BLOCK_SIZE, decrypt_aes_cbc, encrypt_aes_cbc};
-pub use c12::make_vec;
+pub use c10::{AES_BLOCK_SIZE, decrypt_aes_cbc, encrypt_aes_cbc,
+              encrypt_block_ecb};
+pub use c11::make_vec;
 pub use c15::pkcs7_unpad;

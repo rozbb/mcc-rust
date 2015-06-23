@@ -1,7 +1,8 @@
 use set1::decode_b64;
+use c09::minimal_pad;
 use c10::AES_BLOCK_SIZE;
-use c11::encrypt_aes_ecb;
-use c12::{last_n_from, make_vec};
+use c11::{encrypt_aes_ecb, make_vec};
+use c12::last_n_from;
 use rand;
 use rand::Rng;
 use std::collections::HashMap;
@@ -30,7 +31,9 @@ fn get_oracle() -> Encryptor {
         modified_plaintext.extend(plaintext.to_vec());
         modified_plaintext.extend(suffix.clone());
 
-        encrypt_aes_ecb(&modified_plaintext, &key)
+        let padded = minimal_pad(&modified_plaintext, AES_BLOCK_SIZE);
+
+        encrypt_aes_ecb(&padded, &key)
     };
 
     Box::new(oracle)

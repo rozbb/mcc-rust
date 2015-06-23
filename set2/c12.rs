@@ -1,8 +1,9 @@
 use set1::decode_b64;
-use c11::encrypt_aes_ecb;
+use c09::{minimal_pad, pkcs7_pad};
+use c10::AES_BLOCK_SIZE;
+use c11::{encrypt_aes_ecb, make_vec};
 use rand;
 use rand::Rng;
-use std::iter;
 use std::collections::HashMap;
 
 pub type Encryptor = Box<Fn(&[u8]) -> Vec<u8>>;
@@ -23,14 +24,14 @@ fn get_oracle() -> Encryptor {
         let mut modified_plaintext = plaintext.to_vec();
         modified_plaintext.extend(suffix.clone());
 
-        encrypt_aes_ecb(&modified_plaintext, &key)
+        // Need to pad it to a 16 byte boundary or the encryption function
+        // will panic
+        let padded = minimal_pad(&modified_plaintext, AES_BLOCK_SIZE);
+
+        encrypt_aes_ecb(&padded, &key)
     };
 
     Box::new(oracle)
-}
-
-pub fn make_vec(byte: u8, size: usize) -> Vec<u8> {
-    iter::repeat(byte).take(size).collect()
 }
 
 fn find_block_size(oracle: &Encryptor) -> usize {

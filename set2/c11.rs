@@ -1,7 +1,13 @@
-use c09::pkcs7_pad;
+use c09::minimal_pad;
 use c10::{decrypt_block_ecb, encrypt_aes_cbc, encrypt_block_ecb, AES_BLOCK_SIZE};
 use rand;
 use rand::Rng;
+use std::iter;
+
+// Make vector of a specified length with single repeating byte
+pub fn make_vec(byte: u8, size: usize) -> Vec<u8> {
+    iter::repeat(byte).take(size).collect()
+}
 
 #[derive(Copy, Clone, PartialEq, Eq)]
 enum CipherMode {
@@ -10,11 +16,12 @@ enum CipherMode {
 }
 
 pub fn encrypt_aes_ecb(plaintext: &[u8], key: &[u8]) -> Vec<u8> {
-    let padded = pkcs7_pad(plaintext, AES_BLOCK_SIZE);
-
-    padded.chunks(AES_BLOCK_SIZE)
-          .flat_map(|block| encrypt_block_ecb(block, key))
-          .collect()
+    if plaintext.len() % AES_BLOCK_SIZE != 0 {
+        panic!("AES plaintext should be in 16 byte blocks!");
+    }
+    plaintext.chunks(AES_BLOCK_SIZE)
+             .flat_map(|block| encrypt_block_ecb(block, key))
+             .collect()
 }
 
 // Not needed, but why not
@@ -48,12 +55,16 @@ fn get_random_oracle() -> (Box<FnMut(&[u8]) -> Vec<u8>>, CipherMode) {
         modified_plaintext.extend(plaintext.to_vec());
         modified_plaintext.extend(suffix);
 
+        // Need to pad it to a 16 byte boundary or the encryption function
+        // will panic
+        let padded = minimal_pad(&modified_plaintext, AES_BLOCK_SIZE);
+
         match cipher_mode {
-            CipherMode::ECB => encrypt_aes_ecb(&modified_plaintext, &key),
+            CipherMode::ECB => encrypt_aes_ecb(&padded, &key),
             CipherMode::CBC => {
                 let mut iv = [0; 16];
                 rng.fill_bytes(&mut iv);
-                encrypt_aes_cbc(&modified_plaintext, &key, &iv)
+                encrypt_aes_cbc(&padded, &key, &iv)
             }
         }
     };

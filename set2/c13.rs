@@ -1,7 +1,6 @@
-use c09::pkcs7_pad;
+use c09::{minimal_pad, pkcs7_pad};
 use c10::AES_BLOCK_SIZE;
-use c11::{decrypt_aes_ecb, encrypt_aes_ecb};
-use c12::make_vec;
+use c11::{decrypt_aes_ecb, encrypt_aes_ecb, make_vec};
 use rand;
 use rand::Rng;
 use std::collections::HashMap;
@@ -60,7 +59,8 @@ fn get_oracle_pair() -> (CookieEncryptor, CookieDecryptor) {
 
     let enc = move |plaintext: &str| {
         let plaintext: Vec<u8> = profile_for(plaintext).bytes().collect();
-        encrypt_aes_ecb(&plaintext, &key.to_vec())
+        let padded = minimal_pad(&plaintext, AES_BLOCK_SIZE);
+        encrypt_aes_ecb(&padded, &key.to_vec())
     };
 
     let dec = move |ciphertext: &[u8]| {

@@ -1,6 +1,7 @@
 use set1::xor_bytes;
+use c09::minimal_pad;
 use c10::{decrypt_aes_cbc, encrypt_aes_cbc, AES_BLOCK_SIZE};
-use c12::make_vec;
+use c11::make_vec;
 use c15::pkcs7_unpad;
 use rand;
 use rand::Rng;
@@ -34,7 +35,9 @@ fn get_oracle_and_tester() -> (Encryptor, Tester) {
         modified_plaintext.extend(sanitize(plaintext));
         modified_plaintext.extend(suffix.to_vec());
 
-        encrypt_aes_cbc(&modified_plaintext,
+        let padded = minimal_pad(&modified_plaintext, AES_BLOCK_SIZE);
+
+        encrypt_aes_cbc(&padded,
                         &key.to_vec(), &iv.to_vec())
     };
 

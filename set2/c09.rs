@@ -20,6 +20,16 @@ pub fn pkcs7_pad(bytes: &[u8], block_size: usize) -> Vec<u8> {
     out
 }
 
+// For when we don't care how it's padded; equivalent to pkcs7 except
+// it won't add an extra block of padding if the input is alread aligned
+pub fn minimal_pad(bytes: &[u8], block_size: usize) -> Vec<u8> {
+    if bytes.len() % block_size == 0 {
+        bytes.to_vec()
+    } else {
+        pkcs7_pad(bytes, block_size)
+    }
+}
+
 #[test]
 fn tst09() {
     let bytes = b"YELLOW SUBMARINE";

@@ -45,11 +45,14 @@ pub fn decrypt_block_ecb(ciphertext: &[u8], key: &[u8]) -> Vec<u8> {
 // Pretty diagrams here:
 // https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_Block_Chaining_.28CBC.29
 pub fn encrypt_aes_cbc(plaintext: &[u8], key: &[u8], iv: &[u8]) -> Vec<u8> {
-    let padded = pkcs7_pad(plaintext, AES_BLOCK_SIZE);
+    if plaintext.len() % AES_BLOCK_SIZE != 0 {
+        panic!("AES plaintext should be in 16 byte blocks!");
+    }
+
     let mut ciphertext: Vec<u8> = Vec::new();
     let mut prev_ciphertext_block = iv.to_vec();
 
-    for block in padded.chunks(AES_BLOCK_SIZE) {
+    for block in plaintext.chunks(AES_BLOCK_SIZE) {
         let xored = xor_bytes(&prev_ciphertext_block, &block);
         let ciphertext_block = encrypt_block_ecb(&xored, key);
         ciphertext.extend(ciphertext_block.clone());
@@ -64,7 +67,7 @@ pub fn decrypt_aes_cbc(ciphertext: &[u8], key: &[u8], iv: &[u8]) -> Vec<u8> {
     let mut prev_ciphertext_block = iv.to_vec();
 
     if ciphertext.len() % AES_BLOCK_SIZE != 0 {
-        panic!("AES ciphertext should be padded to 16 bytes!");
+        panic!("AES ciphertext should be in 16 byte blocks!");
     }
 
     for block in ciphertext.chunks(AES_BLOCK_SIZE) {
