@@ -2,9 +2,10 @@ use set1::{decode_b64, xor_bytes};
 use set2::{encrypt_block_ecb, make_vec};
 use byteorder::{LittleEndian, WriteBytesExt};
 
-type BytesTransformer = Box<FnMut(&[u8]) -> Vec<u8>>;
+pub type BytesTransformer = Box<FnMut(&[u8]) -> Vec<u8>>;
 
-fn get_aes_ctr(key: &[u8], nonce: &[u8]) -> BytesTransformer {
+// key is 16 bytes; nonce is 8 bytes
+pub fn get_aes_ctr(key: &[u8], nonce: &[u8]) -> BytesTransformer {
     let key_copy = key.to_vec(); // For lifetime purposes
     let reverse_nonce = nonce.iter().rev().cloned().collect::<Vec<u8>>();
     let mut counter = 0u64;
