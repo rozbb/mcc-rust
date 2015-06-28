@@ -63,7 +63,7 @@ fn hex_to_b64(hex: &str) -> String {
 }
 
 #[test]
-fn tst1() {
+fn tst01() {
     assert_eq!(
         hex_to_b64("49276d206b696c6c696e6720796f757220627261696e206c696b652061\
                      20706f69736f6e6f7573206d757368726f6f6d"),

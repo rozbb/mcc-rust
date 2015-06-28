@@ -1,7 +1,7 @@
-use c1::decode_hex;
-use c2::{encode_hex, xor_bytes};
-use c3::{coincidence_err, make_key_vec, test_all_keys};
-use c4::{chi_sq_monogram, chi_sq_bigram, braindead_err, extra_braindead_err};
+use c01::decode_hex;
+use c02::{encode_hex, xor_bytes};
+use c03::{coincidence_err, make_key_vec, test_all_keys};
+use c04::{chi_sq_monogram, chi_sq_bigram, braindead_err, extra_braindead_err};
 use std::fs::File;
 use std::io::{BufReader, Read};
 
@@ -116,7 +116,7 @@ fn break_with_key_size(ciphertext: &[u8], key_size: usize) -> (Vec<u8>, f64) {
 }
 
 #[test]
-fn tst6() {
+fn tst06() {
     assert_eq!(hamming_dist(&"this is a test".as_bytes(),
                             &"wokka wokka!!!".as_bytes()),
                37);
@@ -130,7 +130,7 @@ fn tst6() {
                            696b65206120706f69736f6e6f7573206d757368726f6f6d"));
 
     // Strip all whitespace
-    let ciphertext_b64: String = dump_file("c6.txt").split_whitespace().collect();
+    let ciphertext_b64: String = dump_file("c06.txt").split_whitespace().collect();
     let ciphertext_bytes: Vec<u8> = decode_b64(&ciphertext_b64);
     let mut keysize_err_tuples = sorted_key_sizes(&ciphertext_bytes);
     keysize_err_tuples.truncate(5); // Only test the top 4

@@ -1,8 +1,8 @@
 use iterslide::SlideIterator;
 
-use c1::decode_hex;
-use c2::xor_bytes;
-use c3::{make_key_vec, test_all_keys};
+use c01::decode_hex;
+use c02::xor_bytes;
+use c03::{make_key_vec, test_all_keys};
 use std::ascii::AsciiExt;
 use std::collections::HashMap;
 use std::f64;
@@ -152,13 +152,13 @@ fn test_all<F: Copy+Fn(String) -> f64>(ciphertexts: &[&[u8]],
 }
 
 #[test]
-fn tst4() {
+fn tst04() {
     // braindead_err and extra_braindead_err both work here.
     // chi_sq_monogram does not because "R4^Ho+[7tRO_dV)84fi##[R3LihkwG" has
     //   a lower score than "Now that the party is jumping\n"...go figure.
     // chi_sq_bigram also does not work and I'm not entirely certain why
     let err_func = braindead_err;
-    let lines: Vec<Vec<u8>> = get_lines("c4.txt").iter().map(|s| decode_hex(&*s)).collect();
+    let lines: Vec<Vec<u8>> = get_lines("c04.txt").iter().map(|s| decode_hex(&*s)).collect();
     let borrowed = lines.iter().map(|s| &s[..]).collect::<Vec<&[u8]>>();
 
     let (key_byte, idx, _) = test_all(&borrowed[..], err_func);

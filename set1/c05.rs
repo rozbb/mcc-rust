@@ -1,4 +1,4 @@
-use c2::{encode_hex, xor_bytes};
+use c02::{encode_hex, xor_bytes};
 
 pub fn xor_bytes_repeating(plaintext: &[u8], key: &[u8]) -> Vec<u8> {
     plaintext.chunks(key.len())
@@ -11,7 +11,7 @@ fn xor_string_repeating(message: &str, key: &str) -> String {
 }
 
 #[test]
-fn tst5() {
+fn tst05() {
     let plaintext = "Burning 'em, if you ain't quick and nimble\n\
                      I go crazy when I hear a cymbal";
     let key = "ICE";

@@ -1,4 +1,4 @@
-use c1::decode_hex;
+use c01::decode_hex;
 
 fn nibble_to_char(nibble: u8) -> char {
     match nibble {
@@ -37,7 +37,7 @@ pub fn xor_hex(a: &str, b: &str) -> Vec<u8> {
 }
 
 #[test]
-fn tst2() {
+fn tst02() {
     let a = "1c0111001f010100061a024b53535009181c";
     let b = "686974207468652062756c6c277320657965";
     let xored = xor_hex(a, b);
