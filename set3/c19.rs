@@ -7,9 +7,9 @@ use std::ascii::AsciiExt;
 use std::cmp::Ordering;
 use std::f64;
 
-fn get_ciphertexts() -> Vec<Vec<u8>> {
-    let lines = get_lines("c19.txt").iter().map(|s| decode_b64(s))
-                                    .collect::<Vec<Vec<u8>>>();
+pub fn get_ciphertexts(filename: &str) -> Vec<Vec<u8>> {
+    let lines = get_lines(filename).iter().map(|s| decode_b64(s))
+                                   .collect::<Vec<Vec<u8>>>();
 
     let mut key = [0u8; 16];
     let nonce = [0u8; 8];
@@ -24,7 +24,7 @@ fn get_ciphertexts() -> Vec<Vec<u8>> {
     ciphertexts
 }
 
-pub fn english_error(bytes: &[u8]) -> f64 {
+fn english_error(bytes: &[u8]) -> f64 {
     let s = match String::from_utf8(bytes.to_vec()) {
         Ok(t) => t,
         Err(_) => return f64::INFINITY
@@ -45,7 +45,7 @@ pub fn english_error(bytes: &[u8]) -> f64 {
     1f64 / (count / s.len() as f64)
 }
 
-fn crack_ciphertexts(ciphertexts: &[&[u8]]) -> Vec<String> {
+pub fn crack_ciphertexts(ciphertexts: &[&[u8]]) -> Vec<String> {
     let min_line_len = ciphertexts.iter().map(|line| line.len())
                                   .min().unwrap();
     let n_lines = ciphertexts.len();
@@ -87,7 +87,7 @@ fn crack_ciphertexts(ciphertexts: &[&[u8]]) -> Vec<String> {
 
 #[test]
 fn tst19() {
-    let ciphertexts = get_ciphertexts();
+    let ciphertexts = get_ciphertexts("c19.txt");
     let borrowed = ciphertexts.iter().map(|b| &**b).collect::<Vec<&[u8]>>();
     println!("Challenge 19 approximate plaintext:");
     let plaintexts = crack_ciphertexts(&borrowed);
