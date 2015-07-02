@@ -10,7 +10,7 @@ fn mt_initialize_state(mut state: &mut MTState, seed: u32) {
     }
 }
 
-fn mt_extract_number(mut state: &mut MTState, index: usize) -> u32 {
+fn mt_extract_number(state: &MTState, index: usize) -> u32 {
     let mut y: u32 = state[index];
     y ^=  y >> 11;
     y ^= (y << 07) & 0x9d2c5680u32;
@@ -48,7 +48,7 @@ pub fn get_mt(seed: u32) -> Generator {
             if index == 0 {
                 mt_generate_numbers(&mut state);
             }
-            ret.push(mt_extract_number(&mut state, index));
+            ret.push(mt_extract_number(&state, index));
             index = (index + 1) % 624;
         }
 
