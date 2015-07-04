@@ -4,6 +4,15 @@ use byteorder::{LittleEndian, WriteBytesExt};
 
 pub type BytesTransformer = Box<FnMut(&[u8]) -> Vec<u8>>;
 
+fn move_out_first_n<T>(v: &mut Vec<T>, n: usize) -> Vec<T> {
+    let mut out: Vec<T> = Vec::new();
+    for _ in 0..n {
+        out.push(v.remove(0));
+    }
+
+    out
+}
+
 // key is 16 bytes; nonce is 8 bytes
 pub fn get_aes_ctr(key: &[u8], nonce: &[u8]) -> BytesTransformer {
     let key_copy = key.to_vec(); // For lifetime purposes
@@ -13,17 +22,25 @@ pub fn get_aes_ctr(key: &[u8], nonce: &[u8]) -> BytesTransformer {
     // This does both encryption and decryption
     let transformer = move |input: &[u8]| {
         let mut output: Vec<u8> = Vec::new();
+        let mut keystream_buf = Vec::new();
 
         for chunk in input.chunks(16) {
             let mut counter_vec: Vec<u8> = Vec::new();
             counter_vec.write_u64::<LittleEndian>(counter).unwrap();
 
-            // Our block is 8 bytes of nonce and 8 bytes of counter, both encoded
-            // as little-endian vectors
-            let pre_keystream_block = [reverse_nonce.clone(), counter_vec].concat();
-            let keystream_block = encrypt_block_ecb(&pre_keystream_block, &*key_copy);
+            // Fill up our keystream buffer if necessary
+            if chunk.len() > keystream_buf.len() {
+                // Our block is 8 bytes of nonce and 8 bytes of counter, both encoded
+                // as little-endian vectors
+                let pre_keystream_block = [reverse_nonce.clone(), counter_vec].concat();
+                let keystream_block = encrypt_block_ecb(&pre_keystream_block, &*key_copy);
+                keystream_buf.extend(keystream_block);
+            }
 
-            output.extend(xor_bytes(chunk, &keystream_block[..chunk.len()]));
+            // Pop out key bytes from the beginning of the buffer as we use them
+            let used_key_bytes = move_out_first_n(&mut keystream_buf, chunk.len());
+            let xored = xor_bytes(chunk, &used_key_bytes);
+            output.extend(xored);
 
             counter += 1
         }
