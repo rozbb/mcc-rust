@@ -1,4 +1,4 @@
-//#![allow(dead_code)]
+#![allow(dead_code, unused_imports)]
 
 extern crate set1;
 extern crate set2;
@@ -14,3 +14,4 @@ mod c20;
 mod c21;
 mod c22;
 mod c23;
+mod c24;

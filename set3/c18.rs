@@ -4,7 +4,8 @@ use byteorder::{LittleEndian, WriteBytesExt};
 
 pub type BytesTransformer = Box<FnMut(&[u8]) -> Vec<u8>>;
 
-fn move_out_first_n<T>(v: &mut Vec<T>, n: usize) -> Vec<T> {
+// Would use Vec::split_at but it's currently unstable
+pub fn move_out_first_n<T>(v: &mut Vec<T>, n: usize) -> Vec<T> {
     let mut out: Vec<T> = Vec::new();
     for _ in 0..n {
         out.push(v.remove(0));
