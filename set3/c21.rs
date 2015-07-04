@@ -1,7 +1,7 @@
 pub type Generator = Box<FnMut(usize) -> Vec<u32>>;
-type MTState = [u32; 624];
+pub type MTState = [u32; 624];
 
-fn mt_initialize_state(mut state: &mut MTState, seed: u32) {
+fn mt_initialize_state(state: &mut MTState, seed: u32) {
     state[0] = seed;
     for i in 1usize..624 {
         // Note: as u32 uses the bottom 32 bits
@@ -10,7 +10,7 @@ fn mt_initialize_state(mut state: &mut MTState, seed: u32) {
     }
 }
 
-fn mt_extract_number(state: &MTState, index: usize) -> u32 {
+pub fn mt_extract_number(state: &MTState, index: usize) -> u32 {
     let mut y: u32 = state[index];
     y ^=  y >> 11;
     y ^= (y << 07) & 0x9d2c5680u32;
@@ -20,7 +20,7 @@ fn mt_extract_number(state: &MTState, index: usize) -> u32 {
     y
 }
 
-fn mt_generate_numbers(state: &mut MTState) {
+pub fn mt_generate_numbers(state: &mut MTState) {
     for i in 0..624 {
         let y: u32 = ((state[i] & 0x80000000u32) as u64
                        + (state[(i+1) % 624] & 0x7fffffffu32) as u64) as u32;
