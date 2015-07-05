@@ -1,0 +1,19 @@
+[package]
+name = "set4"
+version = "0.0.1"
+
+[lib]
+name = "set4"
+path = "lib.rs"
+
+[dependencies.set1]
+path = "../set1"
+
+[dependencies.set2]
+path = "../set2"
+
+[dependencies.set3]
+path = "../set3"
+
+[dependencies]
+rand = "0.3.8"

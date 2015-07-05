@@ -15,3 +15,5 @@ mod c21;
 mod c22;
 mod c23;
 mod c24;
+
+pub use c18::get_aes_ctr;
