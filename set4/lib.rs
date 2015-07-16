@@ -7,3 +7,4 @@ extern crate set3;
 extern crate rand;
 
 mod c25;
+mod c26;
