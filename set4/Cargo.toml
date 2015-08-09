@@ -15,5 +15,8 @@ path = "../set2"
 [dependencies.set3]
 path = "../set3"
 
+[dependencies.sha1]
+path = "./rust-sha1"
+
 [dependencies]
 rand = "0.3.8"
