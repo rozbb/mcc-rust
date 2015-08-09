@@ -39,7 +39,7 @@ fn encode_account_cookie(cookie: &Cookie) -> String {
     let keys = ["email", "uid", "role"];
     let values = keys.iter().map(|&k| cookie.get(k).unwrap());
     keys.iter().zip(values).map(|(k, v)| format!("{}={}", *k, &v))
-        .collect::<Vec<_>>().connect("&")
+        .collect::<Vec<_>>().join("&")
 }
 
 fn profile_for(email: &str) -> String {
