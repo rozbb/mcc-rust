@@ -59,7 +59,7 @@ fn find_key(ciphertext_source: &mut BytesGenerator, ascii_tester: &Tester) -> Ve
 }
 
 #[test]
-fn c27() {
+fn tst27() {
     let (mut ciphertext_source, ascii_tester, real_key) = get_source_tester_key();
     let guessed_key = find_key(&mut ciphertext_source, &ascii_tester);
 

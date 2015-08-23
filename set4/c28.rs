@@ -1,11 +1,11 @@
 use sha1::Sha1;
 
-type MacGenerator = Box<Fn(&[u8]) -> Vec<u8>>;
-type Verifier = Box<Fn(&[u8], &[u8]) -> bool>;
+pub type MacGenerator = Box<Fn(&[u8]) -> Vec<u8>>;
+pub type MacVerifier = Box<Fn(&[u8], &[u8]) -> bool>;
 
-fn get_mac_pair(key: &[u8]) -> (MacGenerator, Verifier) {
+pub fn get_mac_pair(key: &[u8]) -> (MacGenerator, MacVerifier) {
     let generator_key_copy: Vec<u8> = key.to_vec();
-    let verified_key_copy = generator_key_copy.clone();
+    let verifier_key_copy = generator_key_copy.clone();
 
     let generator = move |message: &[u8]| {
         let mut h = Sha1::new();
@@ -15,9 +15,9 @@ fn get_mac_pair(key: &[u8]) -> (MacGenerator, Verifier) {
         h.digest()
     };
 
-    let verifier = move |mac: &[u8], message: &[u8]| {
+    let verifier = move |message: &[u8], mac: &[u8]| {
         let mut h = Sha1::new();
-        let buf: Vec<u8> = [&*verified_key_copy, message].concat();
+        let buf: Vec<u8> = [&*verifier_key_copy, message].concat();
         h.update(&*buf);
 
         h.digest() == mac
@@ -27,7 +27,7 @@ fn get_mac_pair(key: &[u8]) -> (MacGenerator, Verifier) {
 }
 
 #[test]
-fn c28() {
+fn tst28() {
     let key = b"YELLOW SUBMARINE";
     let (m, v) = get_mac_pair(key);
 
@@ -36,6 +36,6 @@ fn c28() {
     let invalid_mac = valid_mac.iter().map(|&b| b.wrapping_add(17u8))
                                .collect::<Vec<u8>>();
 
-    assert!( v(&valid_mac, message));
-    assert!(!v(&invalid_mac, message));
+    assert!( v(message, &valid_mac));
+    assert!(!v(message, &invalid_mac));
 }

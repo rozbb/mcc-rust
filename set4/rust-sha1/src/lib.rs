@@ -135,7 +135,7 @@ impl Sha1 {
 
     /// Retrieve digest result.  The output must be large enough to
     /// contain result (20 bytes).
-    pub fn output(&self, out: &mut [u8]) {
+    pub fn output(&self, out: &mut [u8], pad: bool) {
         // these are unlikely to fail, since we're writing to memory
         #![allow(unused_must_use)]
 
@@ -147,13 +147,15 @@ impl Sha1 {
 
         let mut w : Cursor<Vec<u8>> = Cursor::new(Vec::new());
         w.write(&*self.data);
-        w.write_all(&[0x80]);
-        let padding = 64 - ((self.data.len() + 9) % 64);
-        for _ in 0..padding {
-            w.write(&[0u8]);
-        }
+        if (pad) {
+            w.write_all(&[0x80]);
+            let padding = 64 - ((self.data.len() + 9) % 64);
+            for _ in 0..padding {
+                w.write(&[0u8]);
+            }
 
-        w.write_u64::<BigEndian>((self.data.len() as u64 + self.len) * 8);
+            w.write_u64::<BigEndian>((self.data.len() as u64 + self.len) * 8);
+        }
         for chunk in w.into_inner().chunks(64) {
             m.process_block(chunk);
         }
@@ -164,11 +166,19 @@ impl Sha1 {
         }
     }
 
+    fn _digest(&self, pad: bool) -> Vec<u8> {
+        let mut buf = [0u8; 20].to_vec();
+        self.output(&mut buf, pad);
+        buf
+    }
+
+    pub fn digest_no_pad(&self) -> Vec<u8> {
+        self._digest(false)
+    }
+
     /// Shortcut for getting `output` into a new vector.
     pub fn digest(&self) -> Vec<u8> {
-        let mut buf = [0u8; 20].to_vec();
-        self.output(&mut buf);
-        buf
+        self._digest(true)
     }
 
     /// Shortcut for getting a hex output of the vector.
@@ -201,7 +211,7 @@ fn test_simple() {
         let hh = m.hexdigest();
 
         assert_eq!(hh.len(), h.len());
-		assert_eq!(hh, *h);
+        assert_eq!(hh, *h);
     }
 }
 
