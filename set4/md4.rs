@@ -115,13 +115,8 @@ pub fn md4_normal(msg: &[u8]) -> Vec<u8> {
     make_digest(a, b, c, d)
 }
 
-pub fn md4_no_pad(msg: &[u8]) -> Vec<u8> {
-    let (a, b, c, d) = md4_core(0x67452301u32, 0xefcdab89u32, 0x98badcfeu32, 0x10325476u32, msg, false);
-    make_digest(a, b, c, d)
-}
-
-pub fn md4_custom(ra: u32, rb: u32, rc: u32, rd: u32, msg: &[u8], pad: bool) -> Vec<u8> {
-    let (a, b, c, d) = md4_core(ra, rb, rc, rd, msg, pad);
+pub fn md4_custom_no_pad(ra: u32, rb: u32, rc: u32, rd: u32, msg: &[u8]) -> Vec<u8> {
+    let (a, b, c, d) = md4_core(ra, rb, rc, rd, msg, false);
     make_digest(a, b, c, d)
 }
 

@@ -147,7 +147,7 @@ impl Sha1 {
 
         let mut w : Cursor<Vec<u8>> = Cursor::new(Vec::new());
         w.write(&*self.data);
-        if (pad) {
+        if pad {
             w.write_all(&[0x80]);
             let padding = 64 - ((self.data.len() + 9) % 64);
             for _ in 0..padding {
