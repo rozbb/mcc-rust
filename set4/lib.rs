@@ -8,6 +8,8 @@ extern crate byteorder;
 extern crate rand;
 extern crate sha1;
 
+mod md4;
+
 mod c25;
 mod c26;
 mod c27;
