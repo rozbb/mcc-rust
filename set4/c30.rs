@@ -1,7 +1,5 @@
-use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use md4::{md4_normal, md4_custom_no_pad};
-use rand;
-use rand::Rng;
 use std::io::BufReader;
 
 // Copied from c28.rs
