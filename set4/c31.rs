@@ -28,10 +28,11 @@ fn insecure_compare(a: &[u8], b: &[u8]) -> bool {
     true
 }
 
-// Run an http server on localhost:9999
-pub fn run_server(hmac_key: &[u8]) {
+// Run an http server on localhost:9999; takes a leaky comparison function as an argument
+pub fn run_server(hmac_key: &[u8], compare: fn(&[u8], &[u8]) -> bool) {
     let hmac_key_copy = hmac_key.to_vec();
 
+    let mut a = 0;
     // Make a new thread and return; the thread will outlive this function and die
     // only when the program exits
     let server = tiny_http::ServerBuilder::new().with_port(9999).build().unwrap();
@@ -69,9 +70,13 @@ pub fn run_server(hmac_key: &[u8]) {
             }
 
             let calculated_mac = hmac_sha1(file.unwrap().as_bytes(), &*hmac_key_copy);
+            if a == 0 {
+                println!("Real mac: {}", encode_hex(&*calculated_mac));
+                a = 1;
+            }
             let given_mac = decode_hex(&signature.unwrap());
 
-            if insecure_compare(&*calculated_mac, &*given_mac) {
+            if compare(&*calculated_mac, &*given_mac) {
                 req.respond(tiny_http::Response::empty(200));
             }
             else {
@@ -129,7 +134,7 @@ fn find_mac(msg: &[u8]) -> Vec<u8> {
 fn tst31() {
     let key = b"BLUISH SUBMARINE";
     let msg = b"Hello my baby hello my honey";
-    run_server(key);
+    run_server(key, insecure_compare);
 
     let cracked_mac = find_mac(msg);
 
