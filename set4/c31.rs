@@ -121,9 +121,6 @@ fn find_mac(msg: &[u8]) -> Vec<u8> {
         mac[i] = longest_delay_byte.unwrap();
         println!("c31: cracked {} mac bytes", i+1);
     }
-    if !test_sig(msg, &mac) {
-        panic!("Couldn't break MAC!");
-    }
 
     mac.to_vec()
 }
