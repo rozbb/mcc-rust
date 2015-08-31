@@ -50,8 +50,8 @@ fn find_mac(msg: &[u8]) -> Vec<u8> {
             }
         }
         mac[i] = longest_delay_byte.unwrap();
-        //println!("c32: cracked {} mac bytes", i+1);
-        println!("Known mac: {}", encode_hex(&mac[..i+1]));
+        println!("c32: cracked {} mac bytes", i+1);
+        //println!("Known mac: {}", encode_hex(&mac[..i+1]));
     }
 
     mac.to_vec()

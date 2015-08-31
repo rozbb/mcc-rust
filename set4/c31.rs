@@ -32,7 +32,6 @@ fn insecure_compare(a: &[u8], b: &[u8]) -> bool {
 pub fn run_server(hmac_key: &[u8], compare: fn(&[u8], &[u8]) -> bool) {
     let hmac_key_copy = hmac_key.to_vec();
 
-    let mut a = 0;
     // Make a new thread and return; the thread will outlive this function and die
     // only when the program exits
     let server = tiny_http::ServerBuilder::new().with_port(9999).build().unwrap();
@@ -70,10 +69,6 @@ pub fn run_server(hmac_key: &[u8], compare: fn(&[u8], &[u8]) -> bool) {
             }
 
             let calculated_mac = hmac_sha1(file.unwrap().as_bytes(), &*hmac_key_copy);
-            if a == 0 {
-                println!("Real mac: {}", encode_hex(&*calculated_mac));
-                a = 1;
-            }
             let given_mac = decode_hex(&signature.unwrap());
 
             if compare(&*calculated_mac, &*given_mac) {
