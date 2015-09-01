@@ -1,0 +1,11 @@
+[package]
+name = "set5"
+version = "0.0.1"
+
+[lib]
+name = "set5"
+path = "lib.rs"
+
+[dependencies]
+ramp = "0.1.7"
+rand = "0.3.8"
