@@ -1,9 +1,10 @@
 use c33::{mod_exp, P_STR, G_STR};
 use set2::{decrypt_aes_cbc, encrypt_aes_cbc};
+use crypto::sha1::Sha1;
+use crypto::digest::Digest;
 use rand;
 use rand::Rng;
 use ramp::int::{Int, RandomInt};
-use sha1::Sha1;
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, SyncSender};
 use std::thread;
@@ -19,8 +20,10 @@ struct Msg {
 
 fn sha1(msg: &[u8]) -> Vec<u8> {
     let mut h = Sha1::new();
-    h.update(msg);
-    h.digest()
+    h.input(msg);
+    let mut digest = [0u8; 20];
+    h.result(&mut digest);
+    digest.to_vec()
 }
 
 // Returns (secret payload, secure payload exchange succeeded)

@@ -4,7 +4,7 @@ extern crate set2;
 
 extern crate ramp;
 extern crate rand;
-extern crate sha1;
+extern crate crypto;
 
 mod c33;
 mod c34;
