@@ -1,7 +1,7 @@
 use ramp::int::{Int, RandomInt};
 use rand;
 
-static P_STR: &'static str = "\
+pub static P_STR: &'static str = "\
     ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024\
     e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd\
     3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec\
@@ -10,7 +10,7 @@ static P_STR: &'static str = "\
     c55d39a69163fa8fd24cf5f83655d23dca3ad961c62f356208552\
     bb9ed529077096966d670c354e4abc9804f1746c08ca237327fff\
     fffffffffffff";
-static G_STR: &'static str = "2";
+pub static G_STR: &'static str = "2";
 
 // Stolen and modified from https://github.com/jsanders/rust-rsa/blob/master/src/rsa/primes.rs#L32
 // Thank you jsanders!

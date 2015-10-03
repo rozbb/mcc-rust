@@ -6,6 +6,12 @@ version = "0.0.1"
 name = "set5"
 path = "lib.rs"
 
+[dependencies.set2]
+path = "../set2"
+
+[dependencies.sha1]
+path = "../set4/rust-sha1"
+
 [dependencies]
 ramp = "0.1.7"
 rand = "0.3.8"
