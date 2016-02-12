@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 use c33::{mod_exp, P_STR, G_STR};
 use set2::{decrypt_aes_cbc, encrypt_aes_cbc};
 use crypto::sha1::Sha1;
@@ -75,8 +76,10 @@ fn alice(rx: Receiver<Msg>, tx: SyncSender<Msg>) -> (Vec<u8>, bool) {
     // Derive key from shared secret s
     let key = &sha1(s.to_str_radix(16, false).as_bytes())[0..16];
     let mut iv = [0u8; 16];
+    rng.fill_bytes(&mut iv);
     // Make a utf-8 message payload to get echoed back by Bob
-    let mut payload_plaintext = "Viele Grüße\x00\x01\x02".as_bytes();
+    //let payload_plaintext = "Viele Grüße\x00\x01\x02".as_bytes();
+    let payload_plaintext = "Viele Grüße!!!".as_bytes();
     let payload_ciphertext = encrypt_aes_cbc(&*payload_plaintext, &key, &iv);
 
     let msg5 = Msg {
@@ -93,11 +96,11 @@ fn alice(rx: Receiver<Msg>, tx: SyncSender<Msg>) -> (Vec<u8>, bool) {
     // Recieve AES-CBC(SHA1(s)[0:16], iv=random(16), Alice's msg) + iv
     let msg6 = rx.recv().unwrap();
 
-    let (given_ciphertext, given_iv) = msg6.payload.unwrap();
-    let given_plaintext = decrypt_aes_cbc(&given_ciphertext, &key, &given_iv);
+    let (given_ciphertext, new_iv) = msg6.payload.unwrap();
+    let given_plaintext = decrypt_aes_cbc(&given_ciphertext, &key, &new_iv);
 
     // Return if Bob's payload matches ours and his IV is different from ours (to detect replay)
-    let success = payload_plaintext == &*given_plaintext && iv != &*given_iv;
+    let success = payload_plaintext == &*given_plaintext && iv != &*new_iv;
 
     (payload_plaintext.to_vec(), success)
 }
@@ -182,7 +185,7 @@ fn mallory(a_rx: Receiver<Msg>, a_tx: SyncSender<Msg>, b_rx: Receiver<Msg>,
     a_tx.send(msg2).unwrap();
 
     // Pass on A
-    let mut msg3 = a_rx.recv().unwrap();
+    let msg3 = a_rx.recv().unwrap();
     b_tx.send(msg3).unwrap();
 
     // Pass on B

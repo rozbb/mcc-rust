@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 use c33::{mod_exp, P_STR, G_STR};
 use set2::{decrypt_aes_cbc, encrypt_aes_cbc};
 use crypto::sha1::Sha1;
