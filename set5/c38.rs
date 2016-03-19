@@ -44,6 +44,7 @@ fn simple_srp_server(rx: Receiver<Msg>, tx: SyncSender<Msg>, known_email: &str, 
     let msg1 = rx.recv().unwrap();
 
     let given_email = msg1.email.unwrap();
+    assert_eq!(&given_email, known_email);
 
     let A = {
         let A_str = msg1.param.unwrap();
@@ -114,6 +115,7 @@ fn evil_simple_srp_server(rx: Receiver<Msg>, tx: SyncSender<Msg>,
     let msg1 = rx.recv().unwrap();
 
     let given_email = msg1.email.unwrap();
+    assert_eq!(&given_email, known_email);
 
     let A = {
         let A_str = msg1.param.unwrap();

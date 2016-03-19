@@ -3,7 +3,7 @@ use c06::{decode_b64, dump_file};
 use openssl::crypto::symm;
 
 pub fn decrypt_aes_ecb(ciphertext: &[u8], key: &[u8]) -> Vec<u8> {
-    symm::decrypt(symm::Type::AES_128_ECB, key, Vec::<u8>::new(), ciphertext)
+    symm::decrypt(symm::Type::AES_128_ECB, key, &*Vec::<u8>::new(), ciphertext)
 }
 
 #[test]

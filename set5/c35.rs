@@ -172,12 +172,13 @@ fn bob(rx: Receiver<Msg>, tx: SyncSender<Msg>) {
 // Returns the intercepted secret message
 fn mallory(a_rx: Receiver<Msg>, a_tx: SyncSender<Msg>, b_rx: Receiver<Msg>,
            b_tx: SyncSender<Msg>, fiddle_g: &ParamFunc, s_guess: &SecretsFunc) -> Vec<u8> {
-    // Intercept p,g
+    // Intercept p,g; we only need p
     let mut msg1 = a_rx.recv().unwrap();
     let p = Int::from_str_radix(&msg1.p.clone().unwrap(), 16).unwrap();
-    let g = Int::from_str_radix(&msg1.g.clone().unwrap(), 16).unwrap();
     let bad_g = fiddle_g(&p);
-    msg1.g = Some(bad_g.to_str_radix(16, false)); // inject a malicious g parameter
+
+    // inject a malicious g parameter
+    msg1.g = Some(bad_g.to_str_radix(16, false));
     b_tx.send(msg1).unwrap();
 
     // Pass on ACK
@@ -290,7 +291,7 @@ fn tst35() {
 
         // Alice returns true if the exchange succeeded and also returns the secret payload
         // Alice probably won't succeed, because Bob will have a different g than Alice
-        let (payload, alice_success) = alice_handle.join().unwrap();
+        let (payload, _alice_success) = alice_handle.join().unwrap();
         // Mallory returns the payload intercepted from MitM-ing Alice and Bob's connection
         let intercepted_payload = mallory_handle.join().unwrap();
 

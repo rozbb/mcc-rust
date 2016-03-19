@@ -5,8 +5,9 @@ use curl;
 use crypto::mac::Mac;
 use time::precise_time_ns;
 use tiny_http;
+use std::time::Duration;
 use std::thread;
-use std::thread::sleep_ms;
+use std::thread::sleep;
 
 pub fn hmac_sha1(msg: &[u8], key: &[u8]) -> Vec<u8> {
     let mut h = Hmac::new(Sha1::new(), key);
@@ -22,7 +23,7 @@ fn insecure_compare(a: &[u8], b: &[u8]) -> bool {
         if a[i] != b[i] {
             return false;
         }
-        sleep_ms(50);
+        sleep(Duration::from_millis(50));
     }
 
     true
@@ -34,14 +35,18 @@ pub fn run_server(port: u16, hmac_key: &[u8], compare: fn(&[u8], &[u8]) -> bool)
 
     // Make a new thread and return; the thread will outlive this function and die
     // only when the program exits
-    let server = tiny_http::ServerBuilder::new().with_port(port).build().unwrap();
+    let addr = format!("127.0.0.1:{:4}", port);
+    let server = tiny_http::Server::http(&*addr).unwrap();
     thread::spawn(move || {
         loop {
             // Looking for GET /test with headers file:blah, signature:7af24...
             // 400 on bad request, 500 on bad mac, 200 on good mac
+            //println!("Before req");
             let req = server.recv().unwrap(); // Blocks until somebody connects
-            if !(req.method() == &tiny_http::Method::Get) || !(req.url().trim_matches('/') == "test") {
-                req.respond(tiny_http::Response::empty(400));
+            //println!("Past req");
+            if !(req.method() == &tiny_http::Method::Get) ||
+               !(req.url().trim_matches('/') == "test") {
+                req.respond(tiny_http::Response::empty(400)).unwrap();
                 continue;
             }
 
@@ -64,7 +69,7 @@ pub fn run_server(port: u16, hmac_key: &[u8], compare: fn(&[u8], &[u8]) -> bool)
             }
 
             if file.is_none() || signature.is_none() {
-                req.respond(tiny_http::Response::empty(400));
+                req.respond(tiny_http::Response::empty(400)).unwrap();
                 continue;
             }
 
@@ -72,10 +77,10 @@ pub fn run_server(port: u16, hmac_key: &[u8], compare: fn(&[u8], &[u8]) -> bool)
             let given_mac = decode_hex(&signature.unwrap());
 
             if compare(&*calculated_mac, &*given_mac) {
-                req.respond(tiny_http::Response::empty(200));
+                req.respond(tiny_http::Response::empty(200)).unwrap();
             }
             else {
-                req.respond(tiny_http::Response::empty(500));
+                req.respond(tiny_http::Response::empty(500)).unwrap();
             }
         }
     });
@@ -86,6 +91,7 @@ pub fn test_sig(msg: &[u8], mac: &[u8]) -> bool {
                                   .header("signature", &*encode_hex(mac))
                                   .header("file", &*String::from_utf8_lossy(msg))
                                   .exec().unwrap();
+    //println!("Curl response!");
     match res.get_code() {
         200 => true,
         500 => false,
@@ -125,6 +131,7 @@ fn find_mac(msg: &[u8]) -> Vec<u8> {
     mac.to_vec()
 }
 
+#[ignore]
 #[test]
 fn tst31() {
     let key = b"BLUISH SUBMARINE";

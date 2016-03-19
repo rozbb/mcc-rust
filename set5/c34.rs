@@ -162,6 +162,9 @@ fn mallory(a_rx: Receiver<Msg>, a_tx: SyncSender<Msg>, b_rx: Receiver<Msg>,
 
 #[test]
 fn tst34() {
+    // Each actor has their own thread, and has channels to other threads based on the topology
+    // given in the challenge statement
+
     // Test normal case
 
     let (a_tx, b_rx) = mpsc::sync_channel(0);

@@ -1,8 +1,9 @@
-use c36::{bigint_from_bytes, hmac_sha256, sha256, G_STR, N_STR};
+use c36::{sha256, G_STR, N_STR};
 use c33::mod_exp;
 use ramp::int::Int;
 use rand;
 
+// Generating primes is hard
 pub static PRIMES: &'static[&'static str] = &[
    "DFD18B60EA79CF96D466E1EACDFA299A2338BD90C3BB6A53E7F2463ABEDF504CB860CF6EC33606F6B1CAD9D775987B\
     DFB2FDF89E57903E74686DE7253436AB4ECFFDA637F5E01C7850154B35E790ABF5005E9C703DFD8A314777D0D1B5D9\
@@ -112,7 +113,7 @@ pub fn inv_mod(a: &Int, n: &Int) -> Option<Int> {
 
     // Now we have a solution ac + nd = 1 ==> ac = 1 (mod n), so c
     // is our modular inverse. Now just normalize it to a non-negative int
-    if (c >= Int::zero()) {
+    if c >= Int::zero() {
         return Some(c)
     }
     else {

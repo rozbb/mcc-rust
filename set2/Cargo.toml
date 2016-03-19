@@ -6,9 +6,13 @@ version = "0.0.1"
 name = "set2"
 path = "lib.rs"
 
+# Necessary, otherwise challenge 14 takes forever
+[profile.test]
+opt-level = 3
+
 [dependencies.set1]
 path = "../set1"
 
 [dependencies]
-rand = "0.3.8"
-rust-crypto = "0.2.31"
+rand = "0.3"
+rust-crypto = "0.2.*"

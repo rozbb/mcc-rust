@@ -7,5 +7,5 @@ name = "set1"
 path = "lib.rs"
 
 [dependencies]
-iterslide = "0.0.5"
-openssl = "0.6.2"
+iterslide = "0.0"
+openssl = "0.7"

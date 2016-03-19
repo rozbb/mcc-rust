@@ -1,5 +1,5 @@
 #![allow(non_snake_case)]
-use c36::{Msg, N_STR, hmac_sha256, server, sha256};
+use c36::{Msg, hmac_sha256, srp_server, sha256, N_STR};
 use ramp::int::Int;
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, SyncSender};
@@ -49,16 +49,16 @@ fn tst37() {
     let email = "alice@example.com";
     let password = b"donoharm";
 
-    // Any multiple of N works as a "zero key"
+    // Any multiple of n works as a "zero key"
     let zero = Int::from(0);
-    let N = Int::from_str_radix(N_STR, 16).unwrap();
+    let n = Int::from_str_radix(N_STR, 16).unwrap();
 
-    // Try A = 0 == 0 (mod N)
+    // Try A = 0 == 0 (mod n)
     {
         let (s_tx, c_rx) = mpsc::sync_channel(0);
         let (c_tx, s_rx) = mpsc::sync_channel(0);
 
-        thread::spawn(move || { server(s_rx, s_tx, email, password) });
+        thread::spawn(move || { srp_server(s_rx, s_tx, email, password) });
         let client_handle = thread::spawn(move || { evil_client(c_rx, c_tx, email, &zero) });
 
         // Alice returns true if the exchange succeeded
@@ -66,13 +66,13 @@ fn tst37() {
         assert!(success);
     }
 
-    // Try A = N == 0 (mod N)
+    // Try A = n == 0 (mod n)
     {
         let (s_tx, c_rx) = mpsc::sync_channel(0);
         let (c_tx, s_rx) = mpsc::sync_channel(0);
 
-        thread::spawn(move || { server(s_rx, s_tx, email, password) });
-        let client_handle = thread::spawn(move || { evil_client(c_rx, c_tx, email, &N) });
+        thread::spawn(move || { srp_server(s_rx, s_tx, email, password) });
+        let client_handle = thread::spawn(move || { evil_client(c_rx, c_tx, email, &n) });
 
         // Alice returns true if the exchange succeeded
         let success = client_handle.join().unwrap();
