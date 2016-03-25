@@ -15,3 +15,6 @@ mod c37;
 mod c38;
 mod c39;
 mod c40;
+
+pub use c33::mod_exp;
+pub use c39::{inv_mod, PRIMES};

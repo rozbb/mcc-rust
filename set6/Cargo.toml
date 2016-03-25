@@ -1,0 +1,16 @@
+[package]
+name = "set6"
+version = "0.0.1"
+
+[lib]
+name = "set6"
+path = "lib.rs"
+
+[dependencies.set5]
+path = "../set5"
+
+[dependencies.ramp]
+git = "https://github.com/Aatch/ramp.git"
+
+[dependencies]
+rand = "0.3"
