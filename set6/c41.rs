@@ -62,7 +62,7 @@ fn tricky_decrypt(oracle: &mut OptDecryptor, ciphertext: &Int, e: &Int, n: &Int)
 }
 
 #[test]
-fn tst40() {
+fn tst41() {
     println!("Starting");
     let mut rng = rand::thread_rng();
     let (mut decryptor, e, n) = make_random_oracle();
