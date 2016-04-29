@@ -6,6 +6,9 @@ version = "0.0.1"
 name = "set6"
 path = "lib.rs"
 
+[dependencies.set1]
+path = "../set1"
+
 [dependencies.set5]
 path = "../set5"
 
