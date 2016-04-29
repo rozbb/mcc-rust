@@ -30,7 +30,7 @@ pub struct Msg {
 pub fn sha256(msg: &[u8]) -> Vec<u8> {
     let mut h = Sha256::new();
     h.input(msg);
-    let mut digest = [0u8; 256];
+    let mut digest = [0u8; 32];
     h.result(&mut digest);
     digest.to_vec()
 }
