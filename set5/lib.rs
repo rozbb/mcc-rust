@@ -17,5 +17,6 @@ mod c39;
 mod c40;
 
 pub use c33::mod_exp;
+pub use c35::sha1;
 pub use c36::sha256;
 pub use c39::{inv_mod, PRIMES};

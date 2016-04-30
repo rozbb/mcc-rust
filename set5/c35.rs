@@ -23,7 +23,7 @@ struct Msg {
     ack: bool
 }
 
-fn sha1(msg: &[u8]) -> Vec<u8> {
+pub fn sha1(msg: &[u8]) -> Vec<u8> {
     let mut h = Sha1::new();
     h.input(msg);
     let mut digest = [0u8; 20];

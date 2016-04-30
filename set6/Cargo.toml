@@ -6,6 +6,10 @@ version = "0.0.1"
 name = "set6"
 path = "lib.rs"
 
+# Necessary, otherwise challenge 43 takes forever
+[profile.test]
+opt-level = 3
+
 [dependencies.set1]
 path = "../set1"
 
