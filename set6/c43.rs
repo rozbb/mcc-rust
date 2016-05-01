@@ -3,14 +3,14 @@ use set5::{inv_mod, mod_exp, sha1};
 use ramp::{Int, RandomInt};
 use rand;
 
-static Q_STR: &'static str = "f4f47f05794b256174bba6e9b396a7707e563c5b";
+pub static Q_STR: &'static str = "f4f47f05794b256174bba6e9b396a7707e563c5b";
 
-static P_STR: &'static str =
+pub static P_STR: &'static str =
     "800000000000000089e1855218a0e7dac38136ffafa72eda7859f2171e25e65eac698c1702578b07dc2a1076da241\
      c76c62d374d8389ea5aeffd3226a0530cc565f3bf6b50929139ebeac04f48c3c84afb796d61e5a4f9a8fda812ab59\
      494232c7d2b4deb50aa18ee9e132bfa85ac4374d7f9091abc3d015efc871a584471bb1";
 
-static G_STR: &'static str =
+pub static G_STR: &'static str =
     "5958c9d3898b224b12672c0b98e06c60df923cb8bc999d119458fef538b8fa4046c8db53039db620c094c9fa077ef\
      389b5322a559946a71903f990f1f7e0e025e2d7f7cf494aff1a0470f5b64c36b625a097f1651fe775323556fe00b3\
      608c887892878480e99041be601a62166ca6894bdd41a7054ec89f756ba9fc95302291";
@@ -20,7 +20,7 @@ static G_STR: &'static str =
 type Signer = Box<FnMut(&[u8]) -> (Int, Int, Int)>;
 
 // Generate an Int from a message through its hash
-fn hash_int(message: &[u8]) -> Int {
+pub fn hash_int(message: &[u8]) -> Int {
     let hash = encode_hex(&sha1(message));
     Int::from_str_radix(&hash, 16).unwrap()
 }
@@ -73,7 +73,7 @@ fn verify(message: &[u8], (r, s): (&Int, &Int), pub_key: &Int) -> bool {
 }
 
 // This is simple if we're given k
-fn derive_priv_key(message: &[u8], (r, s): (&Int, &Int), k: &Int) -> Int {
+pub fn derive_priv_key(message: &[u8], (r, s): (&Int, &Int), k: &Int) -> Int {
     let q = Int::from_str_radix(Q_STR, 16).unwrap();
     let r_inv = inv_mod(&r, &q).unwrap();
     &(r_inv * (s * k - &hash_int(message))) % q

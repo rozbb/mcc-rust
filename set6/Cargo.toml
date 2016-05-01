@@ -9,6 +9,10 @@ path = "lib.rs"
 # Necessary, otherwise challenge 43 takes forever
 [profile.test]
 opt-level = 3
+debug = false
+debug-assertions = false
+
+#[build.rustflags]
 
 [dependencies.set1]
 path = "../set1"
@@ -21,3 +25,4 @@ git = "https://github.com/Aatch/ramp.git"
 
 [dependencies]
 rand = "0.3"
+itertools = "0.4.13"
