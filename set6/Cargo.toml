@@ -6,23 +6,13 @@ version = "0.0.1"
 name = "set6"
 path = "lib.rs"
 
-# Necessary, otherwise challenge 43 takes forever
-[profile.test]
-opt-level = 3
-debug = false
-debug-assertions = false
-
-#[build.rustflags]
-
 [dependencies.set1]
 path = "../set1"
 
 [dependencies.set5]
 path = "../set5"
 
-[dependencies.ramp]
-git = "https://github.com/Aatch/ramp.git"
-
 [dependencies]
-rand = "0.3"
 itertools = "0.4.13"
+ramp = "0.2.4"
+rand = "0.3"

@@ -12,9 +12,7 @@ path = "../set1"
 [dependencies.set2]
 path = "../set2"
 
-[dependencies.ramp]
-git = "https://github.com/Aatch/ramp.git"
-
 [dependencies]
+ramp = "0.2.4"
 rand = "0.3"
 rust-crypto = "0.2"
