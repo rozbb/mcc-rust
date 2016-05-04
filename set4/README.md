@@ -4,7 +4,7 @@ computer. Even then, some random delays may throw off time calculations. This is
 why the these challenges have been excluded from the `cargo test` set.
 
 Testing `c31.rs` will take 40 minutes and 32 seconds to complete.
-Testing `c32.rs` will take about 5 minues to complete.
+Testing `c32.rs` will take about 5 minutes to complete.
 
 To run the tests and see their progress, run
 
