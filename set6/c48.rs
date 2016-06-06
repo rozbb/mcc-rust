@@ -10,12 +10,13 @@ static Q_STR: &'static str = "D82441545EF5B82298D7EE1FFC900CC5AD6EBEC9EF7BB7A228
 
 #[test]
 fn tst48() {
+    // There's no difference between this and challenge 47, except that it uses a previously unused
+    // function (step 2b) under the hood, and the primes are larger
+
     let p = Int::from_str_radix(P_STR, 16).unwrap();
     let q = Int::from_str_radix(Q_STR, 16).unwrap();
     let orig_msg = string_to_int("kick it, CC");
-    let (oracle, e, n, c) = {
-        make_oracle(&orig_msg, &p, &q)
-    };
+    let (oracle, e, n, c) = make_oracle(&orig_msg, &p, &q);
 
     // This is padded; extract the msg part of it
     let recovered_plaintext = bleichenbacher(oracle, &c, &e, &n);
