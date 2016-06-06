@@ -20,7 +20,7 @@ fn int_to_string(a: &Int) -> String {
     String::from_utf8_lossy(&*bytes).into_owned()
 }
 
-fn string_to_int(s: &str) -> Int {
+pub fn string_to_int(s: &str) -> Int {
     let hex = encode_hex(s.as_bytes());
     Int::from_str_radix(&hex, 16).unwrap()
 }
