@@ -13,6 +13,6 @@ path = "../set1"
 path = "../set5"
 
 [dependencies]
-itertools = "0.4.13"
-ramp = "0.2.4"
+itertools = "0.4"
+ramp = "0.2"
 rand = "0.3"

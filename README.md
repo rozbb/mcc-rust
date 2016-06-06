@@ -5,6 +5,7 @@ Rust solutions for the Matasano Crypto Challenges (http://cryptopals.com)
 
 * Rustc
 * Cargo
+* An x86_64 Linux machine (I think; or at least rust-crypto seems to require it)
 
 ## Usage
 

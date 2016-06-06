@@ -15,4 +15,4 @@ path = "../set2"
 [dependencies]
 ramp = "0.2.4"
 rand = "0.3"
-rust-crypto = "0.2"
+rust-crypto = "=0.2.34"
