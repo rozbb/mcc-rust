@@ -23,10 +23,7 @@ fn decode_cookie(encoded: &str) -> Cookie {
 }
 
 fn sanitize(unclean: &str) -> String {
-    let clean = unclean.to_string();
-    clean.replace("&", "%");
-    clean.replace("=", "%");
-    clean
+    unclean.replace("&", "%").replace("=", "%")
 }
 
 // Apparently not necessary, I'll keep it
@@ -64,52 +61,57 @@ fn get_oracle_pair() -> (CookieEncryptor, CookieDecryptor) {
     };
 
     let dec = move |ciphertext: &[u8]| {
-        String::from_utf8_lossy(&decrypt_aes_ecb(ciphertext, &key.to_vec())).into_owned()
+        // Decrypt and unpad the ciphertext
+        let mut decrypted = decrypt_aes_ecb(ciphertext, &key.to_vec());
+        let orig_len = decrypted.len();
+        let pad_len = decrypted[orig_len-1] as usize;
+        decrypted.truncate(orig_len - pad_len);
+        String::from_utf8_lossy(&*decrypted).into_owned()
     };
 
     (Box::new(enc), Box::new(dec))
 }
 
 fn make_admin_ciphertext(oracle: &CookieEncryptor) -> Vec<u8> {
-    // First find the ciphertext block for
-    // "role=admin\x06\x06\x06\x06\x06\x06"
-    let preimage_copy_block = pkcs7_pad(b"role=admin", AES_BLOCK_SIZE);
+    // First find and copy the ciphertext block for
+    // admin\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b
+    // Then we align 'role=' to the end of a block boundary, and paste the previous
+    // ciphertext to the next block.
+    let admin_block = pkcs7_pad(b"admin", AES_BLOCK_SIZE);
     let left_padding = make_vec(b'A', AES_BLOCK_SIZE - "email=".len());
-    let email_str = [left_padding, preimage_copy_block].iter()
-                    .map(|x| String::from_utf8_lossy(x).into_owned())
-                    .fold(String::new(), |acc, s| acc + &s);
-    let copy_block = oracle(&email_str)[AES_BLOCK_SIZE..AES_BLOCK_SIZE*2].to_vec();
+    // This has to be 2 blocks long in order to get admin at the beginning of a block
+    let admin_email = String::from_utf8_lossy(&*[left_padding, admin_block].concat()).into_owned();
+    let admin_ciphertext_block = oracle(&admin_email).into_iter()
+                                                     .skip(AES_BLOCK_SIZE)
+                                                     .take(AES_BLOCK_SIZE)
+                                                     .collect::<Vec<u8>>();
 
-    // Now align "role=" on a block boundary so we can paste the block
-    let mut email_len = AES_BLOCK_SIZE -
-                        (("email=&uid=xx&".len() + AES_BLOCK_SIZE) % AES_BLOCK_SIZE);
-    if email_len < 7usize {
-        email_len += AES_BLOCK_SIZE; // Because why not
-    }
-    let aligning_email = String::from_utf8_lossy(&make_vec(b'A', email_len-6)).into_owned()
-                         + "@a.com";
-    let mut final_ciphertext = oracle(&aligning_email);
-    // Delete the last ciphertext block
-    for _ in 0..AES_BLOCK_SIZE {
-        final_ciphertext.pop();
-    }
-    // And replace it with the role=admin block
-    final_ciphertext.extend(copy_block);
+    // This is present in every string we make; we pad using the email field until
+    // this string takes up exactly 3 blocks, so that 'role=' is at the end of the block
+    let overhead_len = "email=&uid=xx&role=".len();
+    let email_bytes = make_vec(b'A', AES_BLOCK_SIZE - (overhead_len % AES_BLOCK_SIZE));
+    let email_str = String::from_utf8_lossy(&*email_bytes).into_owned();
 
-    final_ciphertext
+    // This is a 'role=user' ciphertext where 'user' is at the beginning of the last block
+    let ordinary_input = oracle(&email_str);
+    let ordinary_input_len = ordinary_input.len();
+
+    // Now paste admin_ciphertext_block over the last block of ordinary_input
+    ordinary_input.into_iter()
+                  .take(ordinary_input_len - AES_BLOCK_SIZE)
+                  .chain(admin_ciphertext_block)
+                  .collect()
 }
 
 #[test]
 fn tst13() {
+    // Quick unit test of the en/decode functions
     let test_cookie = "email=foo@bar.com&uid=10&role=user";
-    assert_eq!(encode_account_cookie(&decode_cookie(test_cookie)),
-               test_cookie);
+    assert_eq!(encode_account_cookie(&decode_cookie(test_cookie)), test_cookie);
 
+    // Forge a cookie with 'role=admin' using an encryption oracle
     let (enc, dec) = get_oracle_pair();
     let forged_ciphertext = make_admin_ciphertext(&enc);
-    let decrypted_cookie = dec(&forged_ciphertext);
-
-    let correct_suffix = String::from_utf8_lossy(&pkcs7_pad(b"role=admin", AES_BLOCK_SIZE))
-                                                 .into_owned();
-    assert!(decrypted_cookie.ends_with(&correct_suffix));
+    let decoded_cookie = decode_cookie(&dec(&forged_ciphertext));
+    assert_eq!(decoded_cookie["role"], "admin");
 }
