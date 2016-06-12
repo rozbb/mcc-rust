@@ -14,7 +14,7 @@ mod c14;
 mod c15;
 mod c16;
 
-pub use c09::pkcs7_pad;
+pub use c09::{minimal_pad, pkcs7_pad};
 pub use c10::{AES_BLOCK_SIZE, decrypt_aes_cbc, encrypt_aes_cbc,
               encrypt_block_ecb};
 pub use c11::make_vec;
