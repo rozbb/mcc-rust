@@ -88,8 +88,7 @@ fn make_var_iv_oracle(uid: usize) -> (VarMacOracle, SanVarMacOracle) {
         let mandatory_from = format!("{}", uid).into_bytes();
         assert_eq!(&*from_san, &*mandatory_from);
 
-        let message = [&b"from="[..], &*from_san, &b"&to="[..], &*to_san, &b"&amount="[..],
-                       &*amt_san].concat();
+        let message = [b"from=", &*from_san, b"&to=", &*to_san, b"&amount=", &*amt_san].concat();
 
         let mac = cbc_mac(&*message, &*key, iv);
         (message, mac)
@@ -118,7 +117,7 @@ fn make_fixed_iv_oracle(uid: usize) -> (FixedMacOracle, SanFixedMacOracle) {
         let from_san = sanitize(from);
         let mandatory_from = format!("{}", uid).into_bytes();
         assert_eq!(&*from_san, &*mandatory_from);
-        let mut message = [&b"from="[..], &*from_san, &b"&tx_list="[..]].concat();
+        let mut message = [b"from=", &*from_san, b"&tx_list="].concat();
 
         let first_tx = tx_list[0];
         let mut parts = first_tx.split(|&byte| byte == b':');
@@ -128,7 +127,7 @@ fn make_fixed_iv_oracle(uid: usize) -> (FixedMacOracle, SanFixedMacOracle) {
         };
 
         message.extend(&*to_san);
-        message.extend(&b":"[..]);
+        message.extend(b":");
         message.extend(&*amt_san);
 
         // Parse the rest of the tx_list and put a ';' before each pair
@@ -138,9 +137,9 @@ fn make_fixed_iv_oracle(uid: usize) -> (FixedMacOracle, SanFixedMacOracle) {
                 let (to, amt) = (parts.next().unwrap().to_vec(), parts.next().unwrap().to_vec());
                 (sanitize(&*to), sanitize(&*amt))
             };
-            message.extend(&b";"[..]);
+            message.extend(b";");
             message.extend(&*to_san);
-            message.extend(&b":"[..]);
+            message.extend(b":");
             message.extend(&*amt_san);
         }
 
@@ -203,7 +202,7 @@ fn extend_fixed_iv(fixed_iv_oracle: &SanFixedMacOracle, message: &[u8], given_ma
         if !is_clean(&*filler) {
             continue;
         }
-        let tx = [&*filler, &b":0"[..]].concat();
+        let tx = [&*filler, b":0"].concat();
         // This is R = CBC-MAC(B)
         let (_, allowed_mac) = fixed_iv_oracle(&*mallory_uid, &[&*tx]);
         // This is F = R ⊕ P_{n+1} ⊕ C_n. This will be used as a fake amount at the end of the
@@ -260,4 +259,13 @@ fn tst49() {
         assert_eq!(master_oracle(&*forged_msg), forged_mac);
         assert_eq!(&*tx_list[&*mallory_uid], &*b"1000000");
     }
+
+    // Mitigation
+    // * One possible way to prevent the length extension attack is to prepend the length at the
+    //   beginning of the plaintext and ensure that the plaintext is padded to at least 2 blocks.
+    // * Another more obvious potential mitigation is to be much stricter with input formatting.
+    //   Data that the oracle receives could be strictly constrained to ASCII characters. Since the
+    //   attack relies on being able to use arbitrary bytes (minus '&', ':', ';', '=') in the
+    //   plaintext, this ought to prevent at least the naive approach taken here.
+    // * Last mitigation: don't use this algorithm :)
 }
