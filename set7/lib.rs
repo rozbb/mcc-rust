@@ -6,3 +6,4 @@ extern crate set2;
 extern crate rand;
 
 mod c49;
+mod c50;
