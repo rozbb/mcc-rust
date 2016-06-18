@@ -13,4 +13,5 @@ path = "../set1"
 path = "../set2"
 
 [dependencies]
+flate2 = "0.2"
 rand = "0.3"
