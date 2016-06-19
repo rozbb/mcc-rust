@@ -9,3 +9,4 @@ extern crate rand;
 mod c49;
 mod c50;
 mod c51;
+mod c52;
