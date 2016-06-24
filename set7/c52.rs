@@ -6,7 +6,7 @@ const BAD_HASH_DIGEST_SIZE: usize = 2;    // 16 bits
 const DECENT_HASH_DIGEST_SIZE: usize = 4; // 32 bits
 
 // This is a hash function with a 16-bit digest size. This takes in a block of length
-// AES_BLOCK_LENGTH and returns the next state of the hash function
+// AES_BLOCK_SIZE and returns the next state of the hash function
 fn bad_hash_step(msg_block: &[u8], state: &[u8]) -> Vec<u8> {
     assert_eq!(msg_block.len(), AES_BLOCK_SIZE);
     assert_eq!(state.len(), BAD_HASH_DIGEST_SIZE);
@@ -163,6 +163,7 @@ fn tst52() {
             Some(collision) => {
                 let concat1 = concat_hash(&*collision.0);
                 let concat2 = concat_hash(&*collision.1);
+                assert!(collision.0 != collision.1);
                 assert_eq!(&*concat1, &*concat2);
                 println!("Found a decent_hash collision");
                 //println!("Found a decent_hash collision: ({}, {})", encode_hex(&*collision.0),

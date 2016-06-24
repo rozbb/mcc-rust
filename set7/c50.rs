@@ -66,7 +66,6 @@ fn make_js_collision(desired_plaintext: &[u8], desired_hash: &[u8]) -> Vec<u8> {
         // Q_2 cannot escape the Javascript string; if it does, try again (since we're using some
         // randomly-generated values, the outcome should not be the same next iteration)
         if garbage_block.contains(&b'\\') || garbage_block.contains(&b'"') {
-            println!("Continuing");
             continue;
         }
 
