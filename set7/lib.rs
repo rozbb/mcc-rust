@@ -11,3 +11,4 @@ mod c50;
 mod c51;
 mod c52;
 mod c53;
+mod c54;
