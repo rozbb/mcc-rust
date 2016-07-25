@@ -4,6 +4,7 @@ extern crate set1;
 extern crate set2;
 
 extern crate flate2;
+extern crate md4_crypto;
 extern crate rand;
 
 mod c49;
@@ -12,3 +13,4 @@ mod c51;
 mod c52;
 mod c53;
 mod c54;
+mod c55;
