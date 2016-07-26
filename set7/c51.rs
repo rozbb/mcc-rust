@@ -48,7 +48,7 @@ fn make_block_compression_oracle(prefix: &[u8]) -> CompressionOracle {
         c.write(&*prefix_copy).unwrap();
         let length = format!("{}", injected.len()).into_bytes();
         c.write(&*length).unwrap();
-        c.write(b"\n").unwrap();
+        c.write(b"\r\n").unwrap();
         c.write(injected).unwrap();
         let len = c.finish().unwrap().len();
         AES_BLOCK_SIZE * ((len + AES_BLOCK_SIZE - 1) / AES_BLOCK_SIZE)
@@ -138,7 +138,7 @@ fn extend(to_extend: Vec<Vec<u8>>, ext_len: usize, oracle: &CompressionOracle) -
 // each full guess. This perturbation should be able to bring out differences in compression that
 // were otherwised unseen due to bit alignment. A subset of the input is returned
 fn filter(ties: Vec<Vec<u8>>, oracle: &CompressionOracle) -> Vec<Vec<u8>> {
-    // Map of index into ties => length of compressed plaintext
+    // Map of compressed size => indices of ties that compress to that size
     let mut len_map: BTreeMap<usize, Vec<usize>> = BTreeMap::new();
     let mut min_len = usize::MAX;
 
@@ -195,7 +195,7 @@ fn recover_cookie(cookie_length: usize, oracle: &CompressionOracle, oracle_t: Or
 
     // Contains all the winners from each round
     let mut to_extend: Vec<Vec<u8>> = Vec::new();
-    to_extend.push(b"sessionid=".to_vec());
+    to_extend.push(b"Cookie: sessionid=".to_vec());
 
     for i in 0..((cookie_length + step_size - 1) / step_size) {
         // If the step size doesn't divide the cookie length, we don't want to reduce the step
@@ -258,9 +258,9 @@ fn recover_cookie(cookie_length: usize, oracle: &CompressionOracle, oracle_t: Or
 fn tst51() {
     let (stream_oracle, block_oracle) = {
         let prefix = b"\
-            POST / HTTP/1.1\
-            Host: hapless.com\
-            Cookie: sessionid=TmV2ZXIgcmV2ZWFsIHRoZSBXdS1UYW5nIFNlY3JldCE=\
+            POST / HTTP/1.1\r\n\
+            Host: hapless.com\r\n\
+            Cookie: sessionid=TmV2ZXIgcmV2ZWFsIHRoZSBXdS1UYW5nIFNlY3JldCE=\r\n\
             Content-Length: ";
         (make_stream_compression_oracle(&*prefix), make_block_compression_oracle(&*prefix))
     };
