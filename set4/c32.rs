@@ -60,7 +60,7 @@ fn find_mac(msg: &[u8]) -> Vec<u8> {
 fn tst32() {
     let key = b"BLUISH SUBMARINE";
     let msg = b"Hello my baby hello my honey";
-    run_server(9999, key, insecure_compare);
+    run_server(key, insecure_compare);
 
     let cracked_mac = find_mac(msg);
 

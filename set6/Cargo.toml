@@ -14,5 +14,5 @@ path = "../set5"
 
 [dependencies]
 itertools = "0.4"
-ramp = "0.2"
 rand = "0.3"
+ramp = { git = "https://github.com/Aatch/ramp.git", rev="2feef556c" }

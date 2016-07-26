@@ -9,6 +9,8 @@ use std::time::Duration;
 use std::thread;
 use std::thread::sleep;
 
+const PORT: u16 = 9999;
+
 pub fn hmac_sha1(msg: &[u8], key: &[u8]) -> Vec<u8> {
     let mut h = Hmac::new(Sha1::new(), key);
     h.input(msg);
@@ -30,12 +32,12 @@ fn insecure_compare(a: &[u8], b: &[u8]) -> bool {
 }
 
 // Run an http server on localhost:9999; takes a leaky comparison function as an argument
-pub fn run_server(port: u16, hmac_key: &[u8], compare: fn(&[u8], &[u8]) -> bool) {
+pub fn run_server(hmac_key: &[u8], compare: fn(&[u8], &[u8]) -> bool) {
     let hmac_key_copy = hmac_key.to_vec();
 
     // Make a new thread and return; the thread will outlive this function and die
     // only when the program exits
-    let addr = format!("127.0.0.1:{:4}", port);
+    let addr = format!("127.0.0.1:{}", PORT);
     let server = tiny_http::Server::http(&*addr).unwrap();
     thread::spawn(move || {
         loop {
@@ -87,10 +89,12 @@ pub fn run_server(port: u16, hmac_key: &[u8], compare: fn(&[u8], &[u8]) -> bool)
 }
 
 pub fn test_sig(msg: &[u8], mac: &[u8]) -> bool {
-    let res = curl::http::handle().get("http://localhost:9999/test")
+    let url = format!("http://localhost:{}/test", PORT);
+    let res = curl::http::handle().get(url)
                                   .header("signature", &*encode_hex(mac))
                                   .header("file", &*String::from_utf8_lossy(msg))
-                                  .exec().unwrap();
+                                  .exec()
+                                  .unwrap();
     //println!("Curl response!");
     match res.get_code() {
         200 => true,
@@ -136,7 +140,9 @@ fn find_mac(msg: &[u8]) -> Vec<u8> {
 fn tst31() {
     let key = b"BLUISH SUBMARINE";
     let msg = b"Hello my baby hello my honey";
-    run_server(9998, key, insecure_compare);
+    run_server(key, insecure_compare);
+    // Let the server start up
+    sleep(Duration::from_millis(200));
 
     let cracked_mac = find_mac(msg);
 
