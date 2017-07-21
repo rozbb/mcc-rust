@@ -13,7 +13,7 @@ fn find_cube_root(a: &Int) -> Int {
     }
     let mut low = &high / 2;
     while low < high {
-        let mid = &(&low + &high) / &two;
+        let mid: Int = &(&low + &high) / &two;
 
         // Recall (x+1)^3 = x^3 + 3x^2 + 3x. Anything inside this is the best we can get
         let threshold = (&three * &mid * &mid) + (&three * &mid) + Int::one();

@@ -14,7 +14,7 @@ fn find_root(a: &Int, n: usize) -> Int {
     }
     let mut low = &high / 2;
     while low < high {
-        let mid = &(&low + &high) / &two;
+        let mid: Int = &(&low + &high) / &two;
         let pow: Int = mid.pow(n);
         if low < mid && &pow < a {
             low = mid;

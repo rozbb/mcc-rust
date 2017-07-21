@@ -14,5 +14,5 @@ path = "../set2"
 
 [dependencies]
 rand = "0.3"
-rust-crypto = "=0.2.34"
-ramp = { git = "https://github.com/Aatch/ramp.git", rev="2feef556c" }
+rust-crypto = "0.2"
+ramp = "0.3"

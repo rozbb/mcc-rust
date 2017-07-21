@@ -10,7 +10,7 @@ fn get_msgs_sigs(filename: &str) -> Vec<(Vec<u8>, (Int, Int))> {
     let lines = contents.lines();
     let mut entries: Vec<(Vec<u8>, (Int, Int))> = Vec::new();
     // Each entry is 4 lines: msg, s, r, H(msg)
-    for mut entry in lines.chunks_lazy(4).into_iter() {
+    for mut entry in lines.chunks(4).into_iter() {
         let msg_str = entry.next().unwrap();
         let s_str = entry.next().unwrap();
         let r_str = entry.next().unwrap();

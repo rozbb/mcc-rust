@@ -13,6 +13,6 @@ path = "../set1"
 path = "../set5"
 
 [dependencies]
-itertools = "0.4"
+itertools = "0.6"
 rand = "0.3"
-ramp = { git = "https://github.com/Aatch/ramp.git", rev="2feef556c" }
+ramp = "0.3"

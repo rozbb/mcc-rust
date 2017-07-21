@@ -21,4 +21,4 @@ path = "./md4_crypto"
 [dependencies]
 flate2 = "0.2"
 rand = "0.3"
-rust-crypto = "=0.2.34"
+rust-crypto = "0.2"
